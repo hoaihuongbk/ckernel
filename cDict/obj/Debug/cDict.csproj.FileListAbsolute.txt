@@ -1,0 +1,4 @@
+D:\Projects\ckernel\cDict\bin\Debug\cDict.dll
+D:\Projects\ckernel\cDict\bin\Debug\cDict.pdb
+D:\Projects\ckernel\cDict\obj\Debug\cDict.dll
+D:\Projects\ckernel\cDict\obj\Debug\cDict.pdb
