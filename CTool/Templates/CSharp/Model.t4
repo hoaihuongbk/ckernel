@@ -1,0 +1,16 @@
+﻿<#@ template language="C#" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ parameter type="string" name="NameSpace"#>
+<#@ parameter type="string" name="ClassName"#>
+<#@ parameter type="IList<object[]>" name="ListFields"#>
+using System;
+namespace _<#= NameSpace #>.Models
+{
+	public class <#= ClassName #>
+	{
+<# foreach (var item in ListFields) { #>
+		public <#= item[0] #> <#= item[1] #> { get; set;} 
+<# } #>
+	}
+}

@@ -1,0 +1,6 @@
+﻿<#@ template language="C#" #>
+<#@ parameter type="string" name="PageName"#>
+<#@ parameter type="string" name="NameSpace"#>
+<#@ parameter type="string" name="Template"#>
+<%@ Page Language="C#" AutoEventWireup="false" CodeFile="<#= PageName #>.aspx.cs" Inherits="<#= NameSpace #>.<#= PageName #>"%>
+<#= Template #>

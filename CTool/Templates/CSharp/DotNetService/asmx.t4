@@ -1,0 +1,4 @@
+﻿<#@ template language="C#" #>
+<#@ parameter type="string" name="NameSpace"#>
+<#@ parameter type="string" name="ServiceName"#>
+<%@ WebService Language="C#" CodeBehind="<#= ServiceName #>.asmx.cs" Class="<#= NameSpace #>.<#= ServiceName #>" %>

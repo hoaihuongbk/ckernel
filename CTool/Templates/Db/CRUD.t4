@@ -1,0 +1,27 @@
+﻿<#@ template language="C#" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ parameter type="string" name="TableName"#>
+<#@ parameter type="IList<object[]>" name="Columns"#>
+
+IF EXISTS ( SELECT  *
+            FROM    sys.objects
+            WHERE   object_id = OBJECT_ID(N'sgc_Insert<#= TableName #>')
+                    AND type IN ( N'P', N'PC' ) ) 
+DROP PROCEDURE [dbo].[sgc_Insert<#= TableName #>]
+GO
+CREATE PROCEDURE [dbo].[sgc_Insert<#= TableName #>]
+	<# for (var i = 0; i < Columns.Count; i++) { #>
+	@<#= Columns[i][0] #> <#= Columns[i][1] #><# if(!Columns[i][2].Equals(0)){#>(<#= Columns[i][2] #>)<#}#> <# if(i < Columns.Count - 1){#>,<#}#>
+	<# } #>
+AS
+BEGIN
+	begin transaction
+		insert into <#= TableName #>(<# for (var i = 0; i < Columns.Count; i++) { #> <#= Columns[i][0] #><# if(i < Columns.Count - 1){#>,<#}#><#}#>)
+		values(<# for (var i = 0; i < Columns.Count; i++) { #>@<#= Columns[i][0] #><# if(i < Columns.Count - 1){#>,<#}#><#}#>)
+
+		select * from <#= TableName #> where Id = SCOPE_IDENTITY()
+	commit transaction 
+END
+GO
+

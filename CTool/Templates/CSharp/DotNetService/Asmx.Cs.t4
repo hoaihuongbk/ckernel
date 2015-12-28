@@ -1,0 +1,32 @@
+﻿<#@ template language="C#" #>
+<#@ parameter type="string" name="NameSpace"#>
+<#@ parameter type="string" name="ServiceName"#>
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.Services;
+using System.Configuration;
+using cService;
+
+namespace <#= NameSpace #>
+{
+    /// <summary>
+    /// Summary description for WebService1
+    /// </summary>
+    [WebService(Namespace = "http://tempuri.org/")]
+    [WebServiceBinding(ConformsTo = WsiProfiles.BasicProfile1_1)]
+    [System.ComponentModel.ToolboxItem(false)]
+    // To allow this Web Service to be called from script, using ASP.NET AJAX, uncomment the following line. 
+    // [System.Web.Script.Services.ScriptService]
+    public class <#= ServiceName #> : System.Web.Services.WebService
+    {
+        [WebMethod(EnableSession = true)]
+		[ScriptMethod]
+		public object P(object obj)
+		{
+			var s = new S(ConfigurationManager.ConnectionStrings["cConStr"].ConnectionString);
+			return S.P(obj);
+		}
+    }
+}

@@ -1,0 +1,86 @@
+﻿<#@ template language="C#" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ parameter type="string" name="PageName"#>
+<#@ parameter type="string" name="NameSpace"#>
+<#@ parameter type="IList<string>" name="fRequestFields"#>
+<#@ parameter type="IList<string>" name="fRequestFieldDefaultValues"#>
+<#@ parameter type="IDictionary<string, string>" name="fPaterns"#>
+<#@ parameter type="IList<object[]>" name="fConfigs"#>
+<#@ parameter type="Dictionary<string, Dictionary<string, object[]>>" name="fBindings" #>
+using System;
+using System.Web;
+using <#= NameSpace #>.Libs;
+namespace <#= NameSpace #>
+{
+    public partial class <#= PageName #> : System.Web.UI.Page
+    {
+		//Request params (URL, POST, GET)
+        private Dictionary<string, object> _requestParams;
+
+		//Page request fields 
+        private static readonly string[] RequestFields = { <# for(var i = 0; i < fRequestFields.Count; i++) { #>"<#= fRequestFields[i] #>"<# if(i < fRequestFields.Count - 1) {#>, <# } #> <# } #> };
+        private static readonly string[] RequestFieldDefaultValues = { <# for(var i = 0; i < fRequestFieldDefaultValues.Count; i++) { #>"<#= fRequestFieldDefaultValues[i] #>"<# if(i < fRequestFieldDefaultValues.Count - 1) {#>, <# } #> <# } #> };
+
+		private static readonly Dictionary<string, string> Paterns = new Dictionary<string, string>()
+        {
+			<# foreach(KeyValuePair<string, string> entry in fPaterns) { #> {"<#= entry.Key #>", @"<#= entry.Value #>"}, <# } #>
+        };
+
+		private Dictionary<string, List<object[]>> _data;
+
+        protected void Page_Load(object sender, EventArgs e)
+        {
+
+			#region Step 1: Get Request Parameters
+            _requestParams = PageHelper.GetRequestParam(this, Request, RequestFields, RequestFieldDefaultValues, Paterns);
+            #endregion
+
+            #region Step 2: Load modules
+            var dataConfigs = new[]
+            {
+				<# foreach (var item in fConfigs) { #>
+				new Dictionary<string, object>
+				{
+					{"_a", "<#= item[1] #>" },
+					{"_c", new Dictionary<string, object>()
+						{
+							<#= item[2] #>
+						}
+					},
+					{"_sf", new[] { <#= item[3] #> } },
+					{"_pd", "<#= item[0] #>"}
+				},
+				<# } #>
+            };
+            _data = PageHelper.LoadData(dataConfigs);
+            #endregion
+
+            #region Step 3: Mapping template
+            _mapDataTemplate();
+            #endregion
+        }
+
+		/// <summary>
+        /// Map data to template
+        /// </summary>
+        private void _mapDataTemplate()
+        {
+			<# foreach (var item in fBindings) { #>
+				switch(_data["<#= item.Key #>"]) {
+					<# foreach (var item2 in item.Value) { #>
+						<# if(item2.Key != "*") { #>
+						case "<#= item2.Key #>":
+							<#= item2.Value[1] #>.<#= item2.Value[2] #> = PageHelper.MapData(_data["<#= item.Key #>"], <#= item2.Value[0] #>, "<#= item2.Value[3] #>");
+							break;
+						<# } else { #>
+						default:
+							<#= item2.Value[1] #>.<#= item2.Value[2] #> = PageHelper.MapData(_data["<#= item.Key #>"], <#= item2.Value[0] #>, "<#= item2.Value[3] #>");
+							break;
+						<# } #>
+					<# } #>
+				}
+			<# } #>
+        }
+    }
+}

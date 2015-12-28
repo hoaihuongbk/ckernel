@@ -1,0 +1,308 @@
+﻿using System;
+using System.Linq;
+using cDict;
+using cModel;
+
+namespace cKernel
+{
+    public class X2
+    {
+        //Initial value
+        private readonly string _cs; 
+        private readonly bool _isDebug;
+
+        //Request object
+        private GCRequest _robj;
+
+        //Core value
+        public readonly R _r = new R { _s = 1 };
+        //public string _ac { get; set; } //Current action
+        private string[] _a { get; set; } //Current action config
+        private string[][] _fs; // Current list fields
+
+        private readonly string[][] _p = new string[100][];     //Current pushed conditions
+        private int _pIdx = 0;     //Current pushed condition index
+        private string _f;     //Query fields  
+
+        private readonly string[][][] _c = new string[10][][];
+        private readonly string[][][] _d = new string[10][][];
+
+
+        private string[] _sql;         
+
+        public X2(string cs, bool isDebug)
+        {
+            _cs = cs;
+            _isDebug = isDebug;
+        }
+
+        /// <summary>
+        /// Initial
+        /// </summary>
+        /// <param name="obj"></param>
+        public void Init(GCRequest obj)
+        {
+            _robj = obj;
+        }
+
+        /// <summary>
+        /// Check right
+        /// </summary>
+        /// <returns></returns>
+        public X2 R()
+        {
+            if (_r._e) return this; _r._s = 1; _r._m = ""; return this;
+        }
+
+        /// <summary>
+        /// Check action
+        /// </summary>
+        /// <returns></returns>
+        public X2 A()
+        {  
+            // Kiem tra va lay action
+            if (_r._e) return this;
+            if (!String.IsNullOrEmpty(_robj._a))
+            {
+                if (D._a.ContainsKey(_robj._a))
+                {
+                    _a = D._a[_robj._a];
+                    _pIdx = 0;
+                    //_cc = 0;
+                    _fs = _a[0][0] == 'G' ? D._fd[int.Parse(_a[2])] : D._fd[int.Parse(_a[1])];
+                }
+                else if (DE._a.ContainsKey(_robj._a))
+                {
+                    _a = DE._a[_robj._a];
+                    _pIdx = 0;
+                    //_cc = 0;
+                    _fs = _a[0][0] == 'G' ? DE._fd[int.Parse(_a[2])] : DE._fd[int.Parse(_a[1])];
+                }
+                else
+                {
+                    _r._s = 0;
+                    _r._m = _E.E10001.G(_isDebug, null);
+                }
+            }
+            else
+            {
+                _r._s = 0; _r._m = _E.E10002.G(_isDebug, null);
+            }
+            return this;
+        }
+
+        /// <summary>
+        /// Push condition
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public X2 Pc(string value)
+        {
+            if (_r._e) return this;
+            var fi = L(value, 7, 0, _fs.Length, _fs);
+            if (!String.IsNullOrEmpty(fi))
+            {
+                _p[_pIdx] = new[] { value, fi };
+                _pIdx++;
+            }
+            else { _r._s = 0; _r._m = _E.E10005.G(_isDebug, null); }
+            return this;
+        }
+
+        /// <summary>
+        /// Look up field: key, index compare, index value, length, array
+        /// </summary>
+        /// <param name="k"></param>
+        /// <param name="i"></param>
+        /// <param name="j"></param>
+        /// <param name="l"></param>
+        /// <param name="f"></param>
+        /// <returns></returns>
+        public string L(string k, int i, int j, int l, string[][] f)
+        {
+            for (var m = 0; m < l; m++) if (f[m][i] == k) return f[m][j]; return String.Empty;
+        }
+
+        /// <summary>
+        /// Check condition
+        /// </summary>
+        /// <returns></returns>
+        public X2 _CC()
+        {
+            if (_r._e) return this;
+            if (_robj._c.Any())
+            {
+                if (_robj._c.Any(i => String.IsNullOrEmpty(L(i.Key, 0, 0, _p.Length, _p))))
+                {
+                    _r._s = 0; _r._m = _E.E10006.G(_isDebug, null);
+                }
+                
+            }
+            else if (_robj._mc.Any())
+            {
+                if (_robj._mc.Any(c => c.Any(i => String.IsNullOrEmpty(L(i.Key, 0, 0, _p.Length, _p)))))
+                {
+                    _r._s = 0; _r._m = _E.E10006.G(_isDebug, null);
+                }
+            }
+            else
+            {
+                _r._s = 0; _r._m = _E.E10002.G(_isDebug, null);
+            }
+           
+            return this;
+        }
+
+        /// <summary>
+        /// Check field
+        /// </summary>
+        /// <returns></returns>
+        public X2 _CF()
+        {
+            if (_r._e) return this;
+
+            if (_robj._d.Any())
+            {
+                if (_robj._d.Any(i => String.IsNullOrEmpty(L(i.Key, 7, 0, _fs.Length, _fs))))
+                {
+                    _r._s = 0; _r._m = _E.E10007.G(_isDebug, null);
+                }
+                if (!V(_robj._d)) //Validate
+                {
+                    _r._s = 0; _r._m = _E.E10010.G(_isDebug, null);
+                }
+            }
+            else if (_robj._md.Any())
+            {
+                if (_robj._mc.Any(d => d.Any(i => String.IsNullOrEmpty(L(i.Key, 7, 0, _fs.Length, _fs)))))
+                {
+                    _r._s = 0; _r._m = _E.E10007.G(_isDebug, null);
+                }
+                if (_robj._md.Any(d => !V(d)))  //Validate
+                {
+                    _r._s = 0; _r._m = _E.E10010.G(_isDebug, null);
+                }
+            }
+            else
+            {
+                _r._s = 0; _r._m = _E.E10002.G(_isDebug, null);
+            }
+
+            //Assign field
+            _f = !String.IsNullOrEmpty(_robj._f) ? _robj._f : "*";
+
+            return this;
+        }
+
+        /// <summary>
+        /// Validate data
+        /// </summary>
+        /// <param name="d"></param>
+        /// <returns></returns>
+        public bool V(object d)
+        {
+            return true;
+        }
+
+        /// <summary>
+        /// Load condition and data
+        /// </summary>
+        /// <returns></returns>
+        public X2 L()
+        {
+            if (_r._e) return this;
+            if (_robj._c.Any())
+            {
+                var i = 0;
+                foreach (var c in _robj._c)
+                {
+                    _c[0][i] = new[] { c.Key, L(c.Key, 7, 0, _fs.Length, _fs), String.Format("{0}", c.Value) };
+                    i++;
+                }
+                i = 0;
+                foreach (var d in _robj._d)
+                {
+                    _d[0][i] = new[] { d.Key, L(d.Key, 7, 0, _fs.Length, _fs), String.Format("{0}", d.Value) };
+                    i++;
+                }
+            }
+            else if (_robj._mc.Any())
+            {
+                var i = 0;
+                foreach (var c in _robj._mc)
+                {
+                    var j = 0;
+                    foreach (var item in c)
+                    {
+                        _c[i][j] = new[] { item.Key, L(item.Key, 7, 0, _fs.Length, _fs), String.Format("{0}", item.Value) };
+                        j++;
+                    }
+                    i++;
+                }
+                i = 0;
+                foreach (var d in _robj._md)
+                {
+                    var j = 0;
+                    foreach (var item in d)
+                    {
+                        _d[i][j] = new[] { item.Key, L(item.Key, 7, 0, _fs.Length, _fs), String.Format("{0}", item.Value) };
+                        j++;
+                    }
+                    i++;
+                }
+            }
+            else
+            {
+                _r._s = 0; _r._m = _E.E10002.G(_isDebug, null);
+            }
+            return this;
+        }
+
+        /// <summary>
+        /// Generate SQL statement
+        /// </summary>
+        /// <returns></returns>
+        public X2 S()
+        {
+            if (_r._e) return this;
+            var v = _a[0][0] == 'G' ? _a[4] : _a[3];
+            switch (_a[0][0])
+            {
+                case 'G': G(v, _f, _c); break;
+                case 'I': I(v, _d); break;
+                case 'U': U(v, _c, _d); break;
+                case 'D': R(v, _c); break;
+            }
+            return this;
+        }
+
+        /// <summary>
+        /// Generate select statement
+        /// </summary>
+        /// <param name="v"></param>
+        /// <param name="f"></param>
+        /// <param name="l"></param>
+        /// <param name="c"></param>
+        public void G(string v, string f, string[][][] c)
+        {
+            foreach (var item in c)
+            {
+                _sql = string.Format("SELECT {0} FROM {1} {2}", _f, v, LW(c, l));
+            }
+        }
+
+        public string LW(string[][] f, int l)
+        {       // loopup for update sql
+            var r = "";
+            for (var i = 0; i < l; i++)
+            {
+                string x;
+                if (f[i][2].Trim().IndexOf("$x", StringComparison.Ordinal) != -1) x = f[i][2].Replace("$x", f[i][0]);
+                else x = f[i][0] + "=" + ((f[i][1][0] == '0' || f[i][1][0] == '1') ? f[i][2] : ("N'" + f[i][2] + "'"));
+                if (r == "") r += " WHERE " + x; else r += " AND " + x;
+            }
+            return r;
+        }
+
+    }
+}

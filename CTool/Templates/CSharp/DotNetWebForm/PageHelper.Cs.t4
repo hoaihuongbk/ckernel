@@ -1,0 +1,130 @@
+﻿<#@ template language="C#" #>
+<#@ parameter type="string" name="NameSpace"#>
+using System;
+using System.Collections.Generic;
+using System.Configuration;
+using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Web;
+using System.Web.UI;
+using cService;
+
+namespace <#= NameSpace #>.Libs
+{
+    public static class PageHelper
+    {
+        /// <summary>
+        /// Get request params
+        /// </summary>
+        /// <param name="page"></param>
+        /// <param name="request"></param>
+        /// <param name="requestFields"></param>
+        /// <param name="requestFieldDefaultValues"></param>
+        /// <param name="paterns"></param>
+        /// <returns></returns>
+        public static Dictionary<string, object> GetRequestParam(Page page, HttpRequest request, string[] requestFields, string[] requestFieldDefaultValues, Dictionary<string, string> paterns)
+        {
+            var result = new Dictionary<string, object>();
+
+            var url = page.RouteData.Values["url"] != null ? page.RouteData.Values["url"].ToString() : "";
+            if (!String.IsNullOrEmpty(url))
+            {
+                if (paterns.Count > 0)
+                {
+                    var foundKey = "*";
+                    var keys = paterns.Keys.Where(i => i != "*");
+                    foreach (var key in keys.Where(url.Contains))
+                    {
+                        foundKey = key;
+                    }
+                    var rgx = new Regex(paterns[foundKey]);
+                    var match = rgx.Match(url);
+                    if (match.Success)
+                    {
+                        var names = rgx.GetGroupNames();
+                        foreach (var name in names.Where(requestFields.Contains))
+                        {
+                            result.Add(name, match.Groups[name].Value);
+                        }
+                    }
+                }
+            }
+
+            for (var i = 0; i < request.QueryString.Count; i++)
+            {
+                if (!requestFields.Contains(request.QueryString.GetKey(i))) continue;
+                if (!result.ContainsKey(request.QueryString.GetKey(i))) continue;
+                var strings = request.QueryString.GetValues(i);
+                if (strings != null)
+                    result[request.QueryString.GetKey(i)] = strings[0];
+            }
+
+            for (var i = 0; i < request.Form.Count; i++)
+            {
+                if (!requestFields.Contains(request.Form.GetKey(i))) continue;
+                if (!result.ContainsKey(request.Form.GetKey(i))) continue;
+                var strings = request.Form.GetValues(i);
+                if (strings != null)
+                    result[request.Form.GetKey(i)] = strings[0];
+            }
+
+
+            //Default value
+            for (var i = 0; i < requestFields.Count(); i++)
+            {
+                if (!result.ContainsKey(requestFields[i]))
+                {
+                    result.Add(requestFields[i], requestFieldDefaultValues[i]);
+                }
+            }
+
+            return result;
+        }
+        
+        /// <summary>
+        /// Load business data per page
+        /// </summary>
+        /// <param name="modules"></param>
+        /// <returns></returns>
+        public static Dictionary<string, List<object[]>> LoadData(Dictionary<string, object>[] modules)
+        {
+            var data = new Dictionary<string, List<object[]>>();
+            if (!modules.Any()) return data;
+            var s = new S(ConfigurationManager.ConnectionStrings["cConStr"].ConnectionString, Convert.ToBoolean(ConfigurationManager.AppSettings["isDebug"]));
+            foreach (var m in modules)
+            {
+                var obj = new Dictionary<string, object>()
+                {
+                    {"_a", m["_a"]},
+                    {"_c", m["_c"]},
+                    {"_f", String.Join(",", m["_sf"])}
+                };
+                
+                var robj = s.P(obj);
+                var records = robj.GetType().GetProperty("Records").GetValue(robj, null) as List<object[]>;
+                if (records == null) continue;
+                data.Add(m["_pd"].ToString(), records);
+            }
+            return data;
+        }
+
+        public static string MapData(List<object[]> data, int type, string template)
+        {
+            var result = new StringBuilder("");
+            switch (type)
+            {
+                case 1:
+                    result.Append(String.Format(template, Convert.ToString(data[0][0])));
+                    break;
+                case 3:
+                    foreach (var item in data)
+                    {
+                        result.Append(String.Format(template, item));
+                    }
+                    break;
+            }
+            return result.ToString();
+        }
+    }
+}

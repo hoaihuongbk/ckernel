@@ -1,0 +1,867 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
+using System.Linq;
+using Lang.Php;
+
+// ReSharper disable InconsistentNaming
+namespace cKernel2PHP
+{
+    [Page("Index")]
+    public class X2 : PhpDummy
+    {
+        //Initial value
+        private readonly string _cs; 
+        private readonly bool _isDebug;
+
+        private Dictionary<string, string[]> _cda;
+        private Dictionary<int, string[][]> _cdfd;
+
+        //Request object
+        private GCRequest _robj;
+
+        //Core value
+
+        public readonly R _r = new R { _s = 1 };
+        //public string _ac { get; set; } //Current action
+        private string[] _a { get; set; } //Current action config
+        private string[][] _fs; // Current list fields
+
+        private readonly string[][] _p = new string[100][];     //Current pushed conditions
+        private int _pIdx;     //Current pushed condition index
+        private string _f;     //Query fields  
+
+        private readonly string[][][] _c = new string[10][][];
+        private readonly string[][][] _d = new string[10][][];
+
+        private readonly string[][] _od = new string[15][];
+
+        //SQL Statement
+        private readonly List<string> _sql = new List<string>();         
+
+        public X2(string cs, bool isDebug)
+        {
+            _cs = cs;
+            _isDebug = isDebug;
+            _cda = new Dictionary<string, string[]>();
+            _cdfd = new Dictionary<int, string[][]>();
+        }
+
+        public void SDA(params Dictionary<string, string[]>[] args)
+        {
+            foreach(var item in args)
+            {
+                _cda = _cda.Concat(item).ToDictionary(x => x.Key, x => x.Value);
+            }
+        }
+
+        public void SDFD(params Dictionary<int, string[][]>[] args)
+        {
+            foreach (var item in args)
+            {
+                _cdfd = _cdfd.Concat(item).ToDictionary(x => x.Key, x => x.Value);
+            }
+        }
+
+
+        /// <summary>
+        /// Initial
+        /// </summary>
+        /// <param name="obj"></param>
+        public void Init(GCRequest obj)
+        {
+            _robj = obj;
+        }
+
+        /// <summary>
+        /// Check right
+        /// </summary>
+        /// <returns></returns>
+        public X2 R()
+        {
+            if (_r._e) return this; _r._s = 1; _r._m = ""; return this;
+        }
+
+        /// <summary>
+        /// Check action
+        /// </summary>
+        /// <returns></returns>
+        public X2 A()
+        {  
+            // Kiem tra va lay action
+            if (_r._e) return this;
+            if (!String.IsNullOrEmpty(_robj._a))
+            {
+                if (_cda.ContainsKey(_robj._a))
+                {
+                    _a = _cda[_robj._a];
+                    _pIdx = 0;
+                    //_cc = 0;
+                    _fs = _a[0][0] == 'G' ? _cdfd[int.Parse(_a[2])] : _cdfd[int.Parse(_a[1])];
+                //}
+                //else if (DE._a.ContainsKey(_robj._a))
+                //{
+                //    _a = DE._a[_robj._a];
+                //    _pIdx = 0;
+                //    //_cc = 0;
+                //    _fs = _a[0][0] == 'G' ? DE._fd[int.Parse(_a[2])] : DE._fd[int.Parse(_a[1])];
+                }
+                else
+                {
+                    _r._s = 0;
+                    _r._m = _E.E10001.G(_isDebug, null);
+                }
+            }
+            else
+            {
+                _r._s = 0; _r._m = _E.E10002.G(_isDebug, null);
+            }
+            return this;
+        }
+
+        /// <summary>
+        /// Push condition
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public X2 Pc(string value)
+        {
+            if (_r._e) return this;
+            var fi = L(value, 7, 0, _fs.Length, _fs);
+            if (!String.IsNullOrEmpty(fi))
+            {
+                _p[_pIdx] = new[] { value, fi };
+                _pIdx++;
+            }
+            else { _r._s = 0; _r._m = _E.E10005.G(_isDebug, null); }
+            return this;
+        }
+
+        /// <summary>
+        /// Look up field: key, index compare, index value, length, array
+        /// </summary>
+        /// <param name="k"></param>
+        /// <param name="i"></param>
+        /// <param name="j"></param>
+        /// <param name="l"></param>
+        /// <param name="f"></param>
+        /// <returns></returns>
+        public string L(string k, int i, int j, int l, string[][] f)
+        {
+            for (var m = 0; m < l; m++) if (f[m][i] == k) return f[m][j]; return String.Empty;
+        }
+
+        /// <summary>
+        /// Check condition
+        /// </summary>
+        /// <returns></returns>
+        public X2 _CC()
+        {
+            if (_r._e) return this;
+            if (_robj._c != null)
+            {
+                if(_robj._c.Any())
+                {
+                    if (_robj._c.Any(i => String.IsNullOrEmpty(L(i.Key, 0, 0, _p.Length, _p))))
+                    {
+                        _r._s = 0;
+                        _r._m = _E.E10006.G(_isDebug, null);
+                    }
+                    else
+                    {
+                        _c[0] = new string[_robj._c.Count][];
+                    }
+                }
+
+            }
+            if (_robj._mc != null)
+            {
+                if (_robj._mc.Any())
+                {
+                    if (_robj._mc.Any(c => c.Any(i => String.IsNullOrEmpty(L(i.Key, 0, 0, _p.Length, _p)))))
+                    {
+                        _r._s = 0;
+                        _r._m = _E.E10006.G(_isDebug, null);
+                    }
+                    else
+                    {
+                        for (var i = 0; i < _robj._mc.Length; i++)
+                        {
+                            _c[i] = new string[_robj._mc[i].Count][];
+                        }
+                    }
+                }
+            }
+           
+            return this;
+        }
+
+        /// <summary>
+        /// Check field
+        /// </summary>
+        /// <returns></returns>
+        public X2 _CF()
+        {
+            if (_r._e) return this;
+
+            if (_robj._d != null)
+            {
+                if (_robj._d.Any())
+                {
+                    if (_robj._d.Any(i => String.IsNullOrEmpty(L(i.Key, 7, 0, _fs.Length, _fs))))
+                    {
+                        _r._s = 0;
+                        _r._m = _E.E10007.G(_isDebug, null);
+                    }
+                    if (!V(_robj._d)) //Validate
+                    {
+                        _r._s = 0;
+                        _r._m = _E.E10010.G(_isDebug, null);
+                    }
+                    else
+                    {
+                        _d[0] = new string[_robj._d.Count][];
+                    }
+                }
+            }
+            if (_robj._md != null)
+            {
+                if(_robj._md.Any())
+                {
+                    if (_robj._mc.Any(d => d.Any(i => String.IsNullOrEmpty(L(i.Key, 7, 0, _fs.Length, _fs)))))
+                    {
+                        _r._s = 0;
+                        _r._m = _E.E10007.G(_isDebug, null);
+                    }
+                    if (_robj._md.Any(d => !V(d))) //Validate
+                    {
+                        _r._s = 0;
+                        _r._m = _E.E10010.G(_isDebug, null);
+                    }
+                    else
+                    {
+                        for (var i = 0; i < _robj._md.Length; i++)
+                        {
+                            _d[i] = new string[_robj._md[i].Count][];
+                        }
+                    }
+                }
+            }
+
+            //Assign field
+            _f = !String.IsNullOrEmpty(_robj._f) ? _robj._f : "*";
+
+            return this;
+        }
+
+        /// <summary>
+        /// Validate data
+        /// </summary>
+        /// <param name="d"></param>
+        /// <returns></returns>
+        public bool V(object d)
+        {
+            return true;
+        }
+
+        /// <summary>
+        /// Load condition and data, order, limit, offset
+        /// </summary>
+        /// <returns></returns>
+        public X2 L()
+        {
+            if (_r._e) return this;
+            
+            int i;
+            
+            if (_robj._c != null)
+            {
+                if (_robj._c.Any())
+                {
+                    i = 0;
+                    foreach (var c in _robj._c)
+                    {
+                        _c[0][i] = new[] {c.Key, L(c.Key, 7, 0, _fs.Length, _fs), String.Format("{0}", c.Value)};
+                        i++;
+                    }
+                   
+                }
+            }
+
+            if (_robj._d != null)
+            {
+                if (_robj._d.Any())
+                {
+                    i = 0;
+                    foreach (var d in _robj._d)
+                    {
+                        _d[0][i] = new[] { d.Key, L(d.Key, 7, 0, _fs.Length, _fs), String.Format("{0}", d.Value) };
+                        i++;
+                    }
+                }
+            }
+
+
+            if (_robj._mc != null)
+            {
+                if (_robj._mc.Any())
+                {
+                    i = 0;
+                    foreach (var c in _robj._mc)
+                    {
+                        var j = 0;
+                        foreach (var item in c)
+                        {
+                            _c[i][j] = new[]
+                            {item.Key, L(item.Key, 7, 0, _fs.Length, _fs), String.Format("{0}", item.Value)};
+                            j++;
+                        }
+                        i++;
+                    }
+                    
+                }
+            }
+
+            if (_robj._md != null)
+            {
+                if (_robj._md.Any())
+                {
+                    i = 0;
+                    foreach (var d in _robj._md)
+                    {
+                        var j = 0;
+                        foreach (var item in d)
+                        {
+                            _d[i][j] = new[] { item.Key, L(item.Key, 7, 0, _fs.Length, _fs), String.Format("{0}", item.Value) };
+                            j++;
+                        }
+                        i++;
+                    }
+                }
+            }
+
+            if (_robj._od == null) return this;
+            if (!_robj._od.Any()) return this;
+            i = 0;
+            foreach (var od in _robj._od)
+            {
+                _od[i] = new[] {od.Key, L(od.Key, 7, 0, _fs.Length, _fs), String.Format("{0}", od.Value)};
+                i++;
+            }
+
+            return this;
+        }
+
+        /// <summary>
+        /// Generate SQL statement
+        /// </summary>
+        /// <returns></returns>
+        public X2 S()
+        {
+            if (_r._e) return this;
+            var v = _a[0][0] == 'G' ? _a[4] : _a[3];
+            switch (_a[0][0])
+            {
+                case 'G': G(v, _f, _c, _od, _robj._lm, _robj._os); break;
+                //case 'P': PG(v, _f, _c, _od, _robj._lm, _robj._os); break;
+                case 'I': I(v, _d); break;
+                case 'U': U(v, _c, _d); break;
+                case 'D': R(v, _c); break;
+                case 'S': SP(_a[5], _c); break;
+            }
+            return this;
+        }
+
+        /// <summary>
+        /// Generate select statement
+        /// </summary>
+        /// <param name="v"></param>
+        /// <param name="f"></param>
+        /// <param name="c"></param>
+        /// <param name="od"></param>
+        /// <param name="lm"></param>
+        /// <param name="os"></param>
+        public void G(string v, string f, string[][][] c, string[][] od, int? lm, int? os)
+        {
+            var cond = String.Empty;
+            var fcond = c.FirstOrDefault(i => i != null);
+            if (fcond != null)
+            {
+                cond = LW(fcond, fcond.Length);
+            }
+            var order = LOD(od, od.Length);
+            var limit = LLO(lm, os);
+            var sql = String.Format("SELECT {0} FROM {1} {2} {3} {4}", _f, v, cond, order, limit);
+            _sql.Add(sql.Trim(new[] { ' ' }));
+        }
+
+        public void PG(string v, string f, string[][][] c, string[][] od, int? lm, int? os)
+        {
+            var cond = String.Empty;
+            var fcond = c.FirstOrDefault(i => i != null);
+            if (fcond != null)
+            {
+                cond = LW(fcond, fcond.Length);
+                //_sql.Add(String.Format("EXEC {0} @table = {1}, @column = {2}, @sort = {3}, @filter = {4}, @index = {5}, @numOfRow = {6}", "GetPaginationData", v, _f, LOD()  LSP(fcond, fcond.Length)));
+            }
+            var order = LOD(od, od.Length);
+            var sql = String.Format("EXEC {0} @table = {1}, @column = {2}, @sort = {3}, @filter = {4}, @index = {5}, @numOfRow = {6}", "GetPaginationData", v, _f, order, cond, os.HasValue ? os.Value : 0, lm.HasValue ? lm.Value : 1000);
+            _sql.Add(sql.Trim(new[] { ' ' }));
+        }
+
+        /// <summary>
+        /// Look up where statement
+        /// </summary>
+        /// <param name="f"></param>
+        /// <param name="l"></param>
+        /// <returns></returns>
+        public string LW(string[][] f, int l)
+        {       
+            var r = "";
+            for (var i = 0; i < l; i++)
+            {
+                if (f[i] == null) continue;
+                string x;
+                if (f[i][2].Trim().IndexOf("$x", StringComparison.Ordinal) != -1)
+                    x = f[i][2].Replace("$x", f[i][0]);
+                else
+                    x = f[i][0] + "=" +
+                        ((f[i][1][0] == '0' || f[i][1][0] == '1') ? f[i][2] : ("N'" + f[i][2] + "'"));
+                if (r == "") r += " WHERE " + x;
+                else r += " AND " + x;
+            }
+            return r;
+        }
+
+        public string LOD(string[][] f, int l)
+        {
+            var r = "";
+            for (var i = 0; i < l; i++)
+            {
+                if (f[i] == null) continue;
+                var x = String.Format("{0} {1}", f[i][0], f[i][2]);
+                if (r == "") r += " ORDER BY " + x;
+                else r += " , " + x;
+            }
+            return r;
+        }
+
+        public string LLO(int? lm, int? os)
+        {
+            var r = "";
+            if (lm.HasValue && os.HasValue)
+            {
+                r = String.Format(" LIMIT {0} OFFSET {1}", lm.Value, os.Value);
+            }
+            return r;
+        }
+
+
+        /// <summary>
+        /// Generate insert statement
+        /// </summary>
+        /// <param name="v"></param>
+        /// <param name="d"></param>
+        public void I(string v, string[][][] d)
+        {
+            foreach (var item in d)
+            {
+                if (item != null)
+                {
+                    var r = LI(item);
+                    _sql.Add(String.Format("INSERT {0} ({1}) VALUES ({2}); SELECT SCOPE_IDENTITY()", v, r[0], r[1]));
+                }
+            }
+           
+        }
+
+        /// <summary>
+        /// Look up insert value
+        /// </summary>
+        /// <param name="f"></param>
+        /// <returns></returns>
+        public string[] LI(string[][] f)
+        {
+            string[] r = { "", "" };
+            foreach (var t1 in f.Where(t1 => !t1[0].Equals("Id")))
+            {
+                if (r[0] == "") r[0] += t1[0]; else r[0] += "," + t1[0];
+
+                string t;
+                switch (t1[1][0])
+                {
+                    case '0':
+                    case '1':
+                        t = String.IsNullOrEmpty(t1[2]) ? "NULL" : t1[2];
+                        break;
+                    case '4':
+                        t = String.IsNullOrEmpty(t1[2]) ? "NULL" : "N'" + t1[2] + "'";
+                        break;
+                    case '5':
+                        t = String.IsNullOrEmpty(t1[2]) ? "NULL" : "'" + t1[2] + "'";
+                        break;
+                    default:
+                        t = "N'" + t1[2] + "'";
+                        break;
+                }
+                //var t = (t1[1][0] == '0' || t1[1][0] == '1') ? t1[2] : ("N'" + t1[2] + "'");
+                if (r[1] == "") r[1] += t; else r[1] += "," + t;
+            }
+            return r;
+        }
+
+        /// <summary>
+        /// Generate update statement
+        /// </summary>
+        /// <param name="v"></param>
+        /// <param name="c"></param>
+        /// <param name="d"></param>
+        public void U(string v, string[][][] c, string[][][] d)
+        {
+            for (var i = 0; i < c.Length; i++)
+            {
+                if (c[i] != null)
+                {
+                    _sql.Add(String.Format("UPDATE {0} SET {1} {2}", v, LU(d[i]), LU(c[i], c[i].Length)));
+                }
+            }
+        }
+
+        /// <summary>
+        /// Lookup update data
+        /// </summary>
+        /// <param name="f"></param>
+        /// <returns></returns>
+        public string LU(string[][] f)
+        { 
+            var r = "";
+            foreach (var t1 in f.Where(t1 => !t1[0].Equals("Id")))
+            {
+                string t;
+                if (t1[2].Trim().IndexOf("$x", StringComparison.Ordinal) != -1) t = t1[2].Replace("$x", t1[0]);
+                else
+                {
+                    switch (t1[1][0])
+                    {
+                        case '0':
+                        case '1':
+                            t = String.IsNullOrEmpty(t1[2]) ? t1[0] + "= NULL" : t1[0] + "=" + t1[2];
+                            break;
+                        case '4':
+                            t = String.IsNullOrEmpty(t1[2]) ? t1[0] + "=" + "NULL" : t1[0] + "=" + "N'" + t1[2] + "'";
+                            break;
+                        case '5':
+                            t = String.IsNullOrEmpty(t1[2]) ? t1[0] + "=" + "NULL" : t1[0] + "=" + "'" + t1[2] + "'";
+                            break;
+                        default:
+                            t = t1[0] + "=" + "N'" + t1[2] + "'";
+                            break;
+                    }
+                    //t = t1[0] + "=" + ((t1[1][0] == '0' || t1[1][0] == '1') ? t1[2] : ("N'" + t1[2] + "'"));
+                }
+                if (r == "") r += t;
+                else r += ("," + t);
+            }
+            return r;
+        }
+
+        /// <summary>
+        /// Lookup update condition
+        /// </summary>
+        /// <param name="f"></param>
+        /// <param name="l"></param>
+        /// <returns></returns>
+        public string LU(string[][] f, int l)
+        {
+            var r = "";
+            for (var i = 0; i < l; i++)
+            {
+                //if (!f[i][0].Equals("Id", StringComparison.OrdinalIgnoreCase)) continue;
+                string x;
+                if (f[i][2].Trim().IndexOf("$x", StringComparison.Ordinal) != -1) x = f[i][2].Replace("$x", f[i][0]);
+                else x = f[i][0] + "=" + ((f[i][1][0] == '0' || f[i][1][0] == '1') ? f[i][2] : ("N'" + f[i][2] + "'"));
+                //r += " WHERE " + x;
+                if (r == "") r += " WHERE " + x; else r += " AND " + x;
+                //break;
+            }
+            return r;
+        }
+
+        /// <summary>
+        /// Generate delete statement
+        /// </summary>
+        /// <param name="v"></param>
+        /// <param name="c"></param>
+        public void R(string v, string[][][] c)
+        {
+            foreach (var item in c)
+            {
+                if (item != null)
+                {
+                    _sql.Add(String.Format("DELETE FROM {0} {1}", v, LW(item, item.Length)));
+                }
+            }
+        }
+
+        /// <summary>
+        /// Generate storeprocedure exec statement
+        /// </summary>
+        /// <param name="sp"></param>
+        /// <param name="c"></param>
+        public void SP(string sp, string[][][] c)
+        {
+            var fcond = c.FirstOrDefault(i => i != null);
+            if (fcond != null)
+            {
+                _sql.Add(String.Format("EXEC {0} {1}", sp, LSP(fcond, fcond.Length)));
+            }
+            
+        }
+
+        /// <summary>
+        /// Lookup storeprocedure conditions
+        /// </summary>
+        /// <param name="f"></param>
+        /// <param name="l"></param>
+        /// <returns></returns>
+        public string LSP(string[][] f, int l)
+        {
+            var r = "";
+            for (var i = 0; i < l; i++)
+            {
+                if(f[i] == null) continue;
+                string x;
+                if (f[i][2].Trim().IndexOf("$x", StringComparison.Ordinal) != -1) x = f[i][2].Replace("$x", f[i][0]);
+                else x = f[i][0] + "=" + ((f[i][1][0] == '0' || f[i][1][0] == '1') ? f[i][2] : ("N'" + f[i][2] + "'"));
+                r += String.Format("@{0},", x);
+                //break;
+            }
+            return r.Trim(new []{','});
+        }
+
+        /// <summary>
+        /// Execute SQL statement
+        /// </summary>
+        /// <returns></returns>
+        public X2 EX()
+        {
+            if (_r._e) return this;
+            switch (_a[0][0])
+            {
+                case 'G': 
+                case 'S': EXQ(_sql); break;
+                case 'I': 
+                case 'U':
+                case 'D': EXNQ(_sql); break;
+                case 'P': EXPQ(); break;
+            }
+            return this;
+        }
+
+        public void EXPQ()
+        {
+            var result = new DataTable();
+            using (var con = new SqlConnection(_cs))
+            {
+                con.Open();
+
+                var command = con.CreateCommand();
+
+                // Start a local transaction.
+                var transaction = con.BeginTransaction("EXPQ");
+
+                // Must assign both transaction object and connection 
+                // to Command object for a pending local transaction
+                command.Connection = con;
+                command.Transaction = transaction;
+
+                try
+                {
+                    //case 'G': G(v, _f, _c, _od, _robj._lm, _robj._os); break;
+                    var cond = String.Empty;
+                    var fcond = _c.FirstOrDefault(i => i != null);
+                    if (fcond != null)
+                    {
+                        cond = LW(fcond, fcond.Length);
+                        //_sql.Add(String.Format("EXEC {0} @table = {1}, @column = {2}, @sort = {3}, @filter = {4}, @index = {5}, @numOfRow = {6}", "GetPaginationData", v, _f, LOD()  LSP(fcond, fcond.Length)));
+                    }
+
+                    command.CommandText = "GetPaginationData";
+                    command.CommandType = CommandType.StoredProcedure;
+
+                    command.Parameters.Add("@sort", SqlDbType.NVarChar);
+                    command.Parameters["@sort"].Value = LOD(_od, _od.Length);
+                    command.Parameters.Add("@table", SqlDbType.NVarChar);
+                    command.Parameters["@table"].Value = _a[4];
+                    command.Parameters.Add("@column", SqlDbType.NVarChar);
+                    command.Parameters["@column"].Value = _f;
+                    command.Parameters.Add("@filter", SqlDbType.NVarChar);
+                    command.Parameters["@filter"].Value = cond;
+                    command.Parameters.Add("@numOfRow", SqlDbType.Int);
+                    command.Parameters["@numOfRow"].Value = _robj._lm.HasValue ? _robj._lm.Value : 1000;
+                    command.Parameters.Add("@index", SqlDbType.Int);
+                    command.Parameters["@index"].Value = _robj._os.HasValue ? _robj._os.Value : 0;
+
+                    var pIdOut = new SqlParameter("@total", SqlDbType.Int) { Direction = ParameterDirection.Output };
+                    command.Parameters.Add(pIdOut);
+                    var adap = new SqlDataAdapter(command);
+                    adap.Fill(result);
+
+                    var total = 0;
+                    if ((pIdOut.Value != DBNull.Value))
+                        total = (int)(pIdOut.Value);
+
+                    var list = new List<object[]>();
+                    for (var m = 0; m < result.Rows.Count; m++) list.Add(result.Rows[m].ItemArray);
+                    _r._d = list; _r._t = total;
+                    // Attempt to commit the transaction.
+                    transaction.Commit();
+                }
+                catch (Exception ex)
+                {
+                    _r._s = 0; _r._m = _E.E10009.G(_isDebug, ex);
+
+                    //Rollback
+                    transaction.Rollback();
+                }
+            }
+        }
+
+        public void EXQ(List<string> sql)
+        {
+            var result = new DataTable();
+            using (var con = new SqlConnection(_cs))
+            {
+                con.Open();
+
+                var command = con.CreateCommand();
+
+                // Start a local transaction.
+                var transaction = con.BeginTransaction("EXQ");
+
+                // Must assign both transaction object and connection 
+                // to Command object for a pending local transaction
+                command.Connection = con;
+                command.Transaction = transaction;
+
+                try
+                {
+                    var statement = sql.FirstOrDefault(i => !String.IsNullOrEmpty(i));
+                    if (statement != null)
+                    {
+                        command.CommandText = statement;
+                        var adap = new SqlDataAdapter(command);
+                        adap.Fill(result);
+                        var list = new List<object[]>();
+                        for (var m = 0; m < result.Rows.Count; m++) list.Add(result.Rows[m].ItemArray);
+                        _r._d = list; _r._t = result.Rows.Count;
+                    }
+                    // Attempt to commit the transaction.
+                    transaction.Commit();
+                }
+                catch (Exception ex)
+                {
+                    _r._s = 0; _r._m = _E.E10009.G(_isDebug, ex);
+
+                    //Rollback
+                    transaction.Rollback();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Execute non query statement
+        /// </summary>
+        /// <param name="sql"></param>
+        public void EXNQ(List<string> sql)
+        {
+            using (var con = new SqlConnection(_cs))
+            {
+                con.Open();
+
+                var command = con.CreateCommand();
+
+                // Start a local transaction.
+                var transaction = con.BeginTransaction("EXNQ");
+
+                // Must assign both transaction object and connection 
+                // to Command object for a pending local transaction
+                command.Connection = con;
+                command.Transaction = transaction;
+
+                try
+                {
+                    _r._d = new List<object[]>();
+                    foreach (var item in sql)
+                    {
+                        if (String.IsNullOrEmpty(item)) continue;
+                        command.CommandText = item;
+                        var result = command.ExecuteNonQuery();
+                        _r._d.Add(new object[] {result});
+                    }
+                    // Attempt to commit the transaction.
+                    transaction.Commit();
+                }
+                catch (Exception ex)
+                {
+                    _r._s = 0; _r._m = _E.E10009.G(_isDebug, ex);
+
+                    //Rollback
+                    transaction.Rollback();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Check order
+        /// </summary>
+        /// <returns></returns>
+        public X2 _CO()
+        {
+            if (_r._e) return this;
+            if (_robj._od == null) return this;
+            if(_robj._od.Any())
+            {
+                if (_robj._od.Any(i => String.IsNullOrEmpty(L(i.Key, 7, 0, _fs.Length, _fs))))
+                {
+                    _r._s = 0; _r._m = _E.E10012.G(_isDebug, null);
+                }
+            }
+            return this;
+        }
+
+        /// <summary>
+        /// Check limit offset
+        /// </summary>
+        /// <returns></returns>
+        public X2 _CLO()
+        {
+            if (_r._e) return this;
+            if (_robj._lm.HasValue)
+            {
+                if (_robj._lm.Value <= 0)
+                {
+                    _r._s = 0; _r._m = _E.E10013.G(_isDebug, null);
+                }
+            }
+            if (_robj._os.HasValue)
+            {
+                if (_robj._os.Value < 0)
+                {
+                    _r._s = 0; _r._m = _E.E10014.G(_isDebug, null);
+                }
+            }
+            return this;
+        }
+
+        /// <summary>
+        /// Get result
+        /// </summary>
+        /// <returns></returns>
+        public R G()
+        {
+            return _r;
+        }
+    }
+}

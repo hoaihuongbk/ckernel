@@ -1,0 +1,20 @@
+﻿<#@ template language="C#" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ parameter type="IList<object[]>" name="jsConfigs"#>
+//Function declaration
+<# foreach (var item in jsConfigs) { #>
+function <#= item[5] #>(<#= item[7] #>)
+{
+	<#= item[6] #>
+}
+<# } #>
+//Event
+$(function() {
+<# foreach (var item in jsConfigs) { #>
+	$('#<#= item[3] #>').on("<#= item[1] #>", function(){
+		var <#= item[7] #>;
+		var <#= item[8] #> = <#= item[5] #>(<#= item[7] #>);
+	});
+<# } #>
+});
