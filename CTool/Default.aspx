@@ -155,8 +155,8 @@ $.ajax({
         <!-- Include all compiled plugins (below), or include individual files as needed -->
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
         
-        <link href="<%=ResolveUrl("/ctool/css/bootstrap-multiselect.css") %>" rel="stylesheet" type="text/css" />
-<script src="<%=ResolveUrl("/ctool/js/bootstrap-multiselect.js") %>" type="text/javascript"></script>
+        <link href="<%=ResolveUrl("/css/bootstrap-multiselect.css") %>" rel="stylesheet" type="text/css" />
+<script src="<%=ResolveUrl("/js/bootstrap-multiselect.js") %>" type="text/javascript"></script>
 <script type="text/javascript">
     $(function () {
         $('[id*=ListBox1]').multiselect({
