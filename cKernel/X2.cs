@@ -420,8 +420,24 @@ namespace cKernel
                 if (f[i][2].Trim().IndexOf("$x", StringComparison.Ordinal) != -1)
                     x = f[i][2].Replace("$x", f[i][0]);
                 else
-                    x = f[i][0] + "=" +
-                        ((f[i][1][0] == '0' || f[i][1][0] == '1') ? f[i][2] : ("N'" + f[i][2] + "'"));
+                {
+                    switch (f[i][1][0])
+                    {
+                        case '0':
+                        case '1':
+                            x = f[i][0] + "=" + f[i][2];
+                            break;
+                        case '5':
+                            x = f[i][0] + "=" + (string.IsNullOrEmpty(f[i][2]) ? "NULL" : "'" + f[i][2] + "'");
+                            break;
+                        default:
+                            x = f[i][0] + "=" + (string.IsNullOrEmpty(f[i][2]) ? "NULL" : "N'" + SlashQuote(f[i][2]) + "'");
+                            break;
+
+                    }
+                }
+                    //x = f[i][0] + "=" +
+                    //    ((f[i][1][0] == '0' || f[i][1][0] == '1') ? f[i][2] : ("N'" + f[i][2] + "'"));
                 if (r == "") r += " WHERE " + x;
                 else r += " AND " + x;
             }
@@ -489,14 +505,14 @@ namespace cKernel
                     case '1':
                         t = String.IsNullOrEmpty(t1[2]) ? "NULL" : t1[2];
                         break;
-                    case '4':
-                        t = String.IsNullOrEmpty(t1[2]) ? "NULL" : "N'" + t1[2] + "'";
-                        break;
+                    //case '4':
+                    //    t = String.IsNullOrEmpty(t1[2]) ? "NULL" : "N'" + t1[2].Replace("'","\'") + "'";
+                    //    break;
                     case '5':
                         t = String.IsNullOrEmpty(t1[2]) ? "NULL" : "'" + t1[2] + "'";
                         break;
                     default:
-                        t = "N'" + t1[2] + "'";
+                        t = String.IsNullOrEmpty(t1[2]) ? "NULL" : "N'" + SlashQuote(t1[2]) + "'";
                         break;
                 }
                 //var t = (t1[1][0] == '0' || t1[1][0] == '1') ? t1[2] : ("N'" + t1[2] + "'");
@@ -557,14 +573,15 @@ namespace cKernel
                         case '1':
                             t = String.IsNullOrEmpty(t1[2]) ? t1[0] + "= NULL" : t1[0] + "=" + t1[2];
                             break;
-                        case '4':
-                            t = String.IsNullOrEmpty(t1[2]) ? t1[0] + "=" + "NULL" : t1[0] + "=" + "N'" + t1[2] + "'";
-                            break;
+                        //case '4':
+                        //    t = String.IsNullOrEmpty(t1[2]) ? t1[0] + "=" + "NULL" : t1[0] + "=" + "N'" + t1[2].Replace("'", "\'") + "'";
+                        //    break;
                         case '5':
                             t = String.IsNullOrEmpty(t1[2]) ? t1[0] + "=" + "NULL" : t1[0] + "=" + "'" + t1[2] + "'";
                             break;
                         default:
-                            t = t1[0] + "=" + "N'" + t1[2] + "'";
+                            t = String.IsNullOrEmpty(t1[2]) ? t1[0] + "=" + "NULL" : t1[0] + "=" + "N'" + SlashQuote(t1[2]) + "'";
+                            //t = t1[0] + "=" + "N'" + t1[2] + "'";
                             break;
                     }
                     //t = t1[0] + "=" + ((t1[1][0] == '0' || t1[1][0] == '1') ? t1[2] : ("N'" + t1[2] + "'"));
@@ -602,7 +619,22 @@ namespace cKernel
                 //if (!f[i][0].Equals("Id", StringComparison.OrdinalIgnoreCase)) continue;
                 string x;
                 if (f[i][2].Trim().IndexOf("$x", StringComparison.Ordinal) != -1) x = f[i][2].Replace("$x", f[i][0]);
-                else x = f[i][0] + "=" + ((f[i][1][0] == '0' || f[i][1][0] == '1') ? f[i][2] : ("N'" + f[i][2] + "'"));
+                else {
+                    switch (f[i][1][0])
+                    {
+                        case '0':
+                        case '1':
+                            x = f[i][0] + "=" + f[i][2];
+                            break;
+                        case '5':
+                            x = f[i][0] + "=" + "'" + f[i][2] + "'";
+                            break;
+                        default:
+                            x = f[i][0] + "=" + (string.IsNullOrEmpty(f[i][2]) ? "NULL" : "N'" + SlashQuote(f[i][2]) + "'");
+                            break;
+                    }
+                }
+                //x = f[i][0] + "=" + ((f[i][1][0] == '0' || f[i][1][0] == '1') ? f[i][2] : ("N'" + f[i][2] + "'"));
                 //r += " WHERE " + x;
                 if (r == "") r += " WHERE " + x; else r += " AND " + x;
                 //break;
@@ -655,7 +687,22 @@ namespace cKernel
                 if(f[i] == null) continue;
                 string x;
                 if (f[i][2].Trim().IndexOf("$x", StringComparison.Ordinal) != -1) x = f[i][2].Replace("$x", f[i][0]);
-                else x = f[i][0] + "=" + ((f[i][1][0] == '0' || f[i][1][0] == '1') ? f[i][2] : ("N'" + f[i][2] + "'"));
+                else {
+                    switch (f[i][1][0])
+                    {
+                        case '0':
+                        case '1':
+                            x = f[i][0] + "=" + f[i][2];
+                            break;
+                        case '5':
+                            x = f[i][0] + "=" + "'" + f[i][2] + "'";
+                            break;
+                        default:
+                            x = f[i][0] + "=" + (string.IsNullOrEmpty(f[i][2]) ? "NULL" : "N'" + SlashQuote(f[i][2]) + "'");
+                            break;
+                    }
+                }
+                //x = f[i][0] + "=" + ((f[i][1][0] == '0' || f[i][1][0] == '1') ? f[i][2] : ("N'" + f[i][2] + "'"));
                 r += String.Format("@{0},", x);
                 //break;
             }
@@ -885,6 +932,11 @@ namespace cKernel
         public R G()
         {
             return _r;
+        }
+
+        public string SlashQuote(string str)
+        {
+            return str.Replace("'", @"''");
         }
     }
 }

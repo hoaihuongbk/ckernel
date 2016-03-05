@@ -20,3 +20,8 @@
 /gCoreManager/obj
 /gCoreManager/bin
 /packages
+/CKernel.Tests/obj
+/CKernel.Tests/bin
+/cDict/obj
+/cDict/bin
+/TestResults
