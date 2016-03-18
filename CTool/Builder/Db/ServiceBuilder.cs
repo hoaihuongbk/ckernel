@@ -46,6 +46,9 @@ namespace CTool.Builder.Db
                 g.GenerateToFile(_stpl, _scs
                     , new object[] { _ns });
 
+                //Clear object builder folder
+                //Array.ForEach(Directory.GetFiles(_lbdir), System.IO.File.Delete);
+               
                 //Copy kernel lib to object builder
                 System.IO.File.Copy(HttpContext.Current.Server.MapPath("~/bin/cModel.dll"), _mddl, true);
                 System.IO.File.Copy( HttpContext.Current.Server.MapPath("~/bin/cKernel.dll"), _kddl, true);
@@ -73,15 +76,19 @@ namespace CTool.Builder.Db
             {
                 var zipFilePath = HttpContext.Current.Server.MapPath(String.Format("~/ObjectBuilder/{0}.zip", zipFileName));
                 
+                //Remove old file
+                if (System.IO.File.Exists(zipFilePath))
+                {
+                    System.IO.File.Delete(zipFilePath);
+                }
                 // Create temp folder
                 if (!Directory.Exists(_tempDir))
                 {
                     Directory.CreateDirectory(_tempDir);
                 }
-                if (System.IO.File.Exists(zipFilePath))
-                {
-                    System.IO.File.Delete(zipFilePath);
-                }
+                //Remove all olds files in temp folder
+                Array.ForEach(Directory.GetFiles(_tempDir), System.IO.File.Delete);
+
                 //Copy DLL to temp folder
                 System.IO.File.Copy(_mddl, _tmddl, true);
                 System.IO.File.Copy(_kddl, _tkddl, true);

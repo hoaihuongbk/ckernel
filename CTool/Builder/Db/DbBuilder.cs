@@ -32,6 +32,8 @@ namespace CTool.Builder.Db
         private readonly string _tde = HttpContext.Current.Server.MapPath("~/ObjectBuilder/DBDict/DE.cs");
         private readonly string _tpe = HttpContext.Current.Server.MapPath("~/ObjectBuilder/DBDict/PE.cs");
 
+        private readonly string _lbdir = HttpContext.Current.Server.MapPath("~/ObjectBuilder/");
+        private readonly string _modelDir = HttpContext.Current.Server.MapPath("~/ObjectBuilder/Models/");
 
         public DbBuilder(string connStr, string ns = "")
         {
@@ -77,7 +79,7 @@ namespace CTool.Builder.Db
 
                 const string peScope =
                    "using cModel;\r\nusing cKernel;\r\n namespace _{1}.Extend\r\n{{\r\n    public class PE\r\n    {{\r\n        private static string _cs; private static bool _isDebug = false; private static int _loggedUserId;\r\n\t\tpublic PE(string cs, bool isDebug, int uid) {{ _cs = cs; _isDebug = isDebug; _loggedUserId = uid; }}\r\n{0}\r\n    }}\r\n}}";
-                
+
                 //D & P
                 //Get tables list
                 //var db = new Connection(ConfigurationManager.ConnectionStrings["bConStr"].ConnectionString);
@@ -702,15 +704,19 @@ namespace CTool.Builder.Db
                 //var zipFilePath = String.Format(@"{0}\\ObjectBuilder\\{1}.zip", HttpContext.Current.Request.PhysicalApplicationPath, zipFileName);
                 var zipFilePath = HttpContext.Current.Server.MapPath(String.Format("~/ObjectBuilder/{0}.zip", zipFileName));
 
+                // Remove old files
+                if (System.IO.File.Exists(zipFilePath))
+                {
+                    System.IO.File.Delete(zipFilePath);
+                }
                 // Create temp folder
                 if (!Directory.Exists(_tempDir))
                 {
                     Directory.CreateDirectory(_tempDir);
                 }
-                if (System.IO.File.Exists(zipFilePath))
-                {
-                    System.IO.File.Delete(zipFilePath);
-                }
+                //Remove all olds files in temp folder
+                Array.ForEach(Directory.GetFiles(_tempDir), System.IO.File.Delete);
+
                 //Copy DLL to temp folder
                 System.IO.File.Copy(_d, _td, true);
                 System.IO.File.Copy(_de, _tde, true);
@@ -735,7 +741,15 @@ namespace CTool.Builder.Db
             try
             {
                 var stpl = HttpContext.Current.Server.MapPath("~/Templates/CSharp/Model.t4");
-                var lbdir = HttpContext.Current.Server.MapPath("~/ObjectBuilder/");
+                var lbdir = HttpContext.Current.Server.MapPath("~/ObjectBuilder/Models/");
+
+                //Create folders
+                if (!Directory.Exists(lbdir))
+                {
+                    Directory.CreateDirectory(lbdir);
+                }
+                //Remove all olds files in temp folder
+                Array.ForEach(Directory.GetFiles(lbdir), System.IO.File.Delete);
 
                 var db = new Connection(_conStr);
                 var dbNameSpace = _ns;
@@ -755,7 +769,7 @@ namespace CTool.Builder.Db
                         {
                             fields.Add(new []{ _sqlToModelType(Convert.ToString(t.Rows[j]["type_name"])), t.Rows[j]["name"] });
                         }
-                        var scs = String.Format("{0}Models\\{1}.cs", lbdir, tables.Rows[i]["name"]);
+                        var scs = String.Format("{0}\\{1}.cs", lbdir, tables.Rows[i]["name"]);
                         g.GenerateToFile(stpl, scs
                         , new object[] { dbNameSpace, Convert.ToString(tables.Rows[i]["name"]), fields });
                     }
@@ -776,7 +790,7 @@ namespace CTool.Builder.Db
                         {
                             fields.Add(new[] { _sqlToModelType(Convert.ToString(v.Rows[j]["type_name"])), v.Rows[j]["name"] });
                         }
-                        var scs = String.Format("{0}Models\\{1}.cs", lbdir, views.Rows[i]["name"]);
+                        var scs = String.Format("{0}\\{1}.cs", lbdir, views.Rows[i]["name"]);
                         g.GenerateToFile(stpl, scs
                         , new object[] { dbNameSpace, Convert.ToString(views.Rows[i]["name"]), fields });
 
@@ -968,5 +982,31 @@ namespace CTool.Builder.Db
                 Debug.WriteLine(ex);
             }
         }
+
+        public string ZipDBModel(string zipFileName)
+        {
+            try
+            {
+                //var zipFilePath = String.Format(@"{0}\\ObjectBuilder\\{1}.zip", HttpContext.Current.Request.PhysicalApplicationPath, zipFileName);
+                var zipFilePath = HttpContext.Current.Server.MapPath(String.Format("~/ObjectBuilder/{0}.zip", zipFileName));
+
+                // Create temp folder
+                if (System.IO.File.Exists(zipFilePath))
+                {
+                    System.IO.File.Delete(zipFilePath);
+                }
+                //Zip files
+                ZipFile.CreateFromDirectory(_modelDir, zipFilePath);
+
+                return zipFilePath;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex);
+            }
+
+            return String.Empty;
+        }
+
     }
 }

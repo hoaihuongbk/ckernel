@@ -114,6 +114,7 @@
     <Content Include="Templates\CSharp\S.t4" />
     <Content Include="Templates\Db\CRUD.t4" />
     <Content Include="Templates\Js\PageScript.t4" />
+    <None Include="Properties\PublishProfiles\gcorebuilder.pubxml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

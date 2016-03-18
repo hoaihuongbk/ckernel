@@ -7,11 +7,14 @@ using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using CTool.Builder.Db;
+using System.IO;
 
 namespace CTool
 {
     public partial class Default : Page
     {
+        private readonly string _lbdir = HttpContext.Current.Server.MapPath("~/ObjectBuilder/");
+
         protected void Page_Load(object sender, EventArgs e)
         {
             
@@ -67,6 +70,15 @@ namespace CTool
                 var selectV = _getSelectView();
                 var selectSP = _getSelectSP();
 
+                //Delete builder folder
+                //var dir = new DirectoryInfo(_lbdir);
+                //dir.Attributes = dir.Attributes & ~FileAttributes.ReadOnly;
+                //dir.Delete(true);
+                //if (!Directory.Exists(_lbdir))
+                //{
+                //    Directory.CreateDirectory(_lbdir);
+                //}
+
                 k.BuildDBDictionary(selectTbl, selectV, selectSP);
                 //Zip
                 if (HttpContext.Current.Session["conStr"] != null)
@@ -75,14 +87,21 @@ namespace CTool
                     var zipFilePath = k.ZipDBDict(zipFileName);
                     if (!String.IsNullOrEmpty(zipFilePath))
                     {
-                        var response = HttpContext.Current.Response;
-                        response.ClearContent();
-                        response.Clear();
-                        response.ContentType = "application/zip";
-                        response.AddHeader("Content-Disposition", "attachment; filename=" + zipFileName + ".zip;");
-                        response.TransmitFile(zipFilePath);
-                        response.Flush();
-                        response.End();
+                        //var response = HttpContext.Current.Response;
+                        //response.ClearContent();
+                        //response.Clear();
+                        //response.ContentType = "application/zip";
+                        //response.AddHeader("Content-Disposition", "attachment; filename=" + zipFileName + ".zip;");
+                        //response.TransmitFile(zipFilePath);
+                        //response.Flush();
+                        ////System.IO.File.Delete(zipFilePath);
+                        //response.End();
+                        Response.ContentType = "application/zip";
+                        Response.AppendHeader("Content-Disposition", string.Format("attachment; filename={0}.zip;", zipFileName));
+                        Response.WriteFile(zipFilePath);
+                        Response.Flush();
+                        File.Delete(zipFilePath);
+                        Response.End();
                     }
                 }
 
@@ -111,14 +130,22 @@ namespace CTool
                     var zipFilePath = k.ZipDBService(zipFileName);
                     if (!String.IsNullOrEmpty(zipFilePath))
                     {
-                        var response = HttpContext.Current.Response;
-                        response.ClearContent();
-                        response.Clear();
-                        response.ContentType = "application/zip";
-                        response.AddHeader("Content-Disposition", "attachment; filename=" + zipFileName + ".zip;");
-                        response.TransmitFile(zipFilePath);
-                        response.Flush();
-                        response.End();
+                        //var response = HttpContext.Current.Response;
+                        //response.ClearContent();
+                        //response.Clear();
+                        //response.ContentType = "application/zip";
+                        //response.AddHeader("Content-Disposition", "attachment; filename=" + zipFileName + ".zip;");
+                        //response.TransmitFile(zipFilePath);
+                        ////System.IO.File.Delete(zipFilePath);
+                        //response.Flush();
+                        //response.End();
+
+                        Response.ContentType = "application/zip";
+                        Response.AppendHeader("Content-Disposition", string.Format("attachment; filename={0}.zip;", zipFileName));
+                        Response.WriteFile(zipFilePath);
+                        Response.Flush();
+                        File.Delete(zipFilePath);
+                        Response.End();
                     }
                 }
                 Response.Redirect(HttpContext.Current.Request.RawUrl);
@@ -213,7 +240,35 @@ namespace CTool
                 var k = new DbBuilder(info, ns);
                 k.BuildDBModel();
 
+                //Zip
+                if (HttpContext.Current.Session["conStr"] != null)
+                {
+                    var zipFileName = "DBModel" + GetMd5Sum(HttpContext.Current.Session["conStr"].ToString());
+                    var zipFilePath = k.ZipDBModel(zipFileName);
+                    if (!String.IsNullOrEmpty(zipFilePath))
+                    {
+                        //var response = HttpContext.Current.Response;
+                        //response.ClearContent();
+                        //response.Clear();
+                        //response.ContentType = "application/zip";
+                        //response.AddHeader("Content-Disposition", "attachment; filename=" + zipFileName + ".zip;");
+                        //response.TransmitFile(zipFilePath);
+                        //response.Flush();
+                        ////System.IO.File.Delete(zipFilePath);
+                        //response.End();
+
+                        Response.ContentType = "application/zip";
+                        Response.AppendHeader("Content-Disposition", string.Format("attachment; filename={0}.zip;", zipFileName));
+                        Response.WriteFile(zipFilePath);
+                        Response.Flush();
+                        File.Delete(zipFilePath);
+                        Response.End();
+
+                    }
+                }
                 Response.Redirect(HttpContext.Current.Request.RawUrl);
+
+                //Response.Redirect(HttpContext.Current.Request.RawUrl);
             }
             catch (Exception ex)
             {
