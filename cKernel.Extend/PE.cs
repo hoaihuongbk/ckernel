@@ -1,50 +1,32 @@
 using cModel;
+using cKernel;
+using cDict;
+
 namespace cKernel.Extend
 {
     public class PE
     {
-        private static string _cs; private static bool _isDebug; private static int _loggedUserId;
-        public PE(string cs, bool isDebug, int uid) { _cs = cs; _isDebug = isDebug; _loggedUserId = uid; }
-		//for gc_Page_Data_Service_Condition_View00
-		public static void gc_Page_Data_Service_Condition_View00(GCRequest obj, out GCResponse oo)
+        private static string _cs; private static bool _isDebug = false; private static int _loggedUserId;
+		public PE(string cs, bool isDebug, int uid) { _cs = cs; _isDebug = isDebug; _loggedUserId = uid; }
+		//for tbl_PT_MailBox_View_OutBox
+		public static void tbl_PT_MailBox_View_OutBox(GCRequest obj, out GCResponse oo)
 		{
-            var x = new X2(_cs, _isDebug, _loggedUserId); x.Init(obj);
-		    var r = x.R().A().Pc("PageDataServiceId").Pc("Conditions")._CC()._CF()._CO()._CLO().L().S().EX().G();
+		    var x = new X3(_cs, _isDebug, _loggedUserId ); x.SDA(D._a, DE._a); x.SDFD(D._fd, DE._fd); x.Init(obj);
+		    var r = x.R().A().Pc("Id").Pc("Type").Pc("Code").Pc("Name").Pc("To").Pc("CC").Pc("BCC").Pc("Subject").Pc("Body").Pc("Status").Pc("IsPrgCreatedDate").Pc("IsPrgUpdatedDate").Pc("IsPrgCreatedUserId").Pc("IsPrgUpdatedUserId")._CC()._CF()._CO()._CLO().L().S().EX().G();
 		    oo = new GCResponse { Result = r._e ? 0 : 1, Records = r._d, TotalRecordCount = r._t, Message = r._m };
 		}
-		//for gc_Page_Data_View00
-		public static void gc_Page_Data_View00(GCRequest obj, out GCResponse oo)
+		//for tbl_PT_MailBox_View_SentBox
+		public static void tbl_PT_MailBox_View_SentBox(GCRequest obj, out GCResponse oo)
 		{
-		    var x = new X2(_cs, _isDebug); x.Init(obj);
-		    var r = x.R().A().Pc("PageId").Pc("Name").Pc("Action").Pc("Conditions").Pc("Fields").Pc("BindingType").Pc("BindingName").Pc("BindingAttributeName").Pc("TemplatePath").Pc("BindingPageDataValue")._CC()._CF()._CO()._CLO().L().S().EX().G();
+		    var x = new X3(_cs, _isDebug, _loggedUserId ); x.SDA(D._a, DE._a); x.SDFD(D._fd, DE._fd); x.Init(obj);
+		    var r = x.R().A().Pc("Id").Pc("Type").Pc("Code").Pc("Name").Pc("To").Pc("CC").Pc("BCC").Pc("Subject").Pc("Body").Pc("Status").Pc("IsPrgCreatedDate").Pc("IsPrgUpdatedDate").Pc("IsPrgCreatedUserId").Pc("IsPrgUpdatedUserId")._CC()._CF()._CO()._CLO().L().S().EX().G();
 		    oo = new GCResponse { Result = r._e ? 0 : 1, Records = r._d, TotalRecordCount = r._t, Message = r._m };
 		}
-		//for gc_Template_Slot_View00
-		public static void gc_Template_Slot_View00(GCRequest obj, out GCResponse oo)
+		//for slyt_SetNextAccount
+		public static void slyt_SetNextAccount(GCRequest obj, out GCResponse oo)
 		{
-		    var x = new X2(_cs, _isDebug); x.Init(obj);
-		    var r = x.R().A().Pc("Id").Pc("Type").Pc("TemplateId2").Pc("TemplateId1").Pc("SlotCode").Pc("Code").Pc("FilePath")._CC()._CF()._CO()._CLO().L().S().EX().G();
-		    oo = new GCResponse { Result = r._e ? 0 : 1, Records = r._d, TotalRecordCount = r._t, Message = r._m };
-		}
-		//for gc_Function_Input_View00
-		public static void gc_Function_Input_View00(GCRequest obj, out GCResponse oo)
-		{
-		    var x = new X2(_cs, _isDebug); x.Init(obj);
-		    var r = x.R().A().Pc("FunctionId").Pc("Inputs")._CC()._CF()._CO()._CLO().L().S().EX().G();
-		    oo = new GCResponse { Result = r._e ? 0 : 1, Records = r._d, TotalRecordCount = r._t, Message = r._m };
-		}
-		//for gc_Function_Output_View00
-		public static void gc_Function_Output_View00(GCRequest obj, out GCResponse oo)
-		{
-		    var x = new X2(_cs, _isDebug); x.Init(obj);
-		    var r = x.R().A().Pc("FunctionId").Pc("Outputs")._CC()._CF()._CO()._CLO().L().S().EX().G();
-		    oo = new GCResponse { Result = r._e ? 0 : 1, Records = r._d, TotalRecordCount = r._t, Message = r._m };
-		}
-		//for GetPageEventFunction
-		public static void GetPageEventFunction(GCRequest obj, out GCResponse oo)
-		{
-		    var x = new X2(_cs, _isDebug); x.Init(obj);
-		    var r = x.R().A().Pc("PageTemplateId")._CC()._CF()._CO()._CLO().L().S().EX().G();
+		    var x = new X3(_cs, _isDebug, _loggedUserId ); x.SDA(D._a, DE._a); x.SDFD(D._fd, DE._fd); x.Init(obj);
+		    var r = x.R().A().Pc("CurrentId")._CC()._CF()._CO()._CLO().L().S().EX().G();
 		    oo = new GCResponse { Result = r._e ? 0 : 1, Records = r._d, TotalRecordCount = r._t, Message = r._m };
 		}
 

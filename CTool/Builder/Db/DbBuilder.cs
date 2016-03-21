@@ -12,6 +12,7 @@ using System.IO.Compression;
 using System.Web.UI.WebControls;
 using CTool.Builder.File;
 using OMS.Ice.T4Generator;
+using System.Data;
 
 namespace CTool.Builder.Db
 {
@@ -66,7 +67,7 @@ namespace CTool.Builder.Db
                 const string pScope =
                     "using cModel;\r\nusing cKernel;\r\n namespace _{1}.Extend\r\n{{\r\n    public class P\r\n    {{\r\n        private static string _cs; private static bool _isDebug = false; private static int _loggedUserId; \r\n\t\tpublic P(string cs, bool isDebug, int uid) {{ _cs = cs; _isDebug = isDebug; _loggedUserId = uid; }}\r\n{0}\r\n    }}\r\n}}";
                 const string pFormat =
-                    "\t\t//for {0}\r\n\t\tpublic static void {0}(GCRequest obj, out GCResponse oo)\r\n\t\t{{\r\n\t\t    var x = new X2(_cs, _isDebug, _loggedUserId ); x.SDA(D._a, DE._a); x.SDFD(D._fd, DE._fd); x.Init(obj);\r\n\t\t    var r = x.R().A(){1}._CC()._CF()._CO()._CLO().L().S().EX().G();\r\n\t\t    oo = new GCResponse {{ Result = r._e ? 0 : 1, Records = r._d, TotalRecordCount = r._t, Message = r._m }};\r\n\t\t}}\r\n";
+                    "\t\t//for {0}\r\n\t\tpublic static void {0}(GCRequest obj, out GCResponse oo)\r\n\t\t{{\r\n\t\t    var x = new X3(_cs, _isDebug, _loggedUserId ); x.SDA(D._a, DE._a); x.SDFD(D._fd, DE._fd); x.Init(obj);\r\n\t\t    var r = x.R().A(){1}._CC()._CF()._CO()._CLO().L().S().EX().G();\r\n\t\t    oo = new GCResponse {{ Result = r._e ? 0 : 1, Records = r._d, TotalRecordCount = r._t, Message = r._m }};\r\n\t\t}}\r\n";
                 const string pCFormat = ".Pc(\"{0}\")";
 
                 const string deScope =
@@ -528,74 +529,67 @@ namespace CTool.Builder.Db
             return String.Format("{0}_View", tableName);
         }
 
-        private static string _sqlToSimpleType(string type)
+        private static int _sqlToSimpleType(string type)
         {
+            int result;
             switch (type)
             {
                 case "char":
-                    return "4";
-
+                    result = (int)SqlDbType.Char;
+                    break;
                 case "nchar":
-                    return "4";
-
+                    result = (int)SqlDbType.NChar;
+                    break;
                 case "varchar":
-                    return "4";
-
+                    result = (int)SqlDbType.VarChar;
+                    break;
                 case "nvarchar":
-                    return "4";
-
+                    result = (int)SqlDbType.NVarChar;
+                    break;
                 case "text":
-                    return "4";
-
+                    result = (int)SqlDbType.Text;
+                    break;
                 case "ntext":
-                    return "4";
-
-                case "systemtype":
-                    return "4";
-
+                    result = (int)SqlDbType.NText;
+                    break;
                 case "int":
-                    return "1";
-
+                    result = (int)SqlDbType.Int;
+                    break;
                 case "bigint":
-                    return "1";
-
-                case "double":
-                    return "2";
-
+                    result = (int)SqlDbType.BigInt;
+                    break;
                 case "float":
-                    return "2";
-
+                    result = (int)SqlDbType.Float;
+                    break;
                 case "real":
-                    return "2";
-
-                case "numeric":
-                    return "2";
-
+                    result = (int)SqlDbType.Real;
+                    break;
                 case "datetime":
-                    return "5";
-
+                    result = (int)SqlDbType.DateTime;
+                    break;
                 case "bit":
-                    return "9";
-
+                    result = (int)SqlDbType.Bit;
+                    break;
                 case "image":
-                    return "6";
-
+                    result = (int)SqlDbType.Image;
+                    break;
                 case "varbinary":
-                    return "6";
-
+                    result = (int)SqlDbType.VarBinary;
+                    break;
                 case "binary":
-                    return "6";
-
+                    result = (int)SqlDbType.Binary;
+                    break;
                 case "tinyint":
-                    return "1";
-
-                case "byte":
-                    return "1";
-
+                    result = (int)SqlDbType.TinyInt;
+                    break;
                 case "smallint":
-                    return "1";
+                    result = (int)SqlDbType.SmallInt;
+                    break;
+                default:
+                    result = (int)SqlDbType.NVarChar;
+                    break;
             }
-            return "4";
+            return result;
         }
 
 

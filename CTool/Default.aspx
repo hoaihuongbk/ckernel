@@ -6,7 +6,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>GCORE TOOL - Version 1.0</title>
+    <title>GCORE TOOL - Version 1.0.1</title>
 
     <!-- Bootstrap -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
@@ -28,7 +28,7 @@
     <form runat="server">
         <div class="container-fluid" id="ctool">
             <div class="page-header">
-                <h1>GCORE TOOL - Version 1.0</h1>
+                <h1>GCORE TOOL - Version 1.0.1</h1>
                 <p class="lead">The website builder include database, service, app, template...</p>
             </div>
             <h3>Step 1: Database Builder</h3>
@@ -90,16 +90,15 @@
             <h4>How to use this service?</h4>
             <div class="row-fluid">
                 <pre>
-var service = new S(connectionString);
-var obj = new Dictionary< <% Response.Write("string"); %> , <% Response.Write("object"); %> >
+var service = new S(connectionString, isDebug, uid); //isDebug = true -> show error message in response object, uid is logged user id
+var obj = new GCRequest
 {
-    {"_a", "fGetgc_App"}, //Action prefix f,p for get data; gc_App is table name
-    {"_c", new Dictionary< <% Response.Write("string"); %> , <% Response.Write("object"); %>>
+    _a = "fGetgc_App", //Action prefix f,p for get data; gc_App is table name
+    _c = new Dictionary< <% Response.Write("string"); %> , <% Response.Write("object"); %>>
     {
-            {"Id", appId}   //Condition: Id = appId
-        }
+        {"Id", appId}   //Condition: Id = appId
     },
-    {"_f", "Id, Name"}
+    _f = "Id, Name"
 };
 var robj = service.P(obj); // {Result: 0 is failed, 1 is success, Records: List object array, TotalRecordCount: number of records, Message: error content }
                 </pre>

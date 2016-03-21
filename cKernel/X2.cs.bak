@@ -4,6 +4,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using cModel;
+using System.Text.RegularExpressions;
 
 // ReSharper disable InconsistentNaming
 namespace cKernel
@@ -38,7 +39,8 @@ namespace cKernel
         private readonly string[][] _od = new string[15][];
 
         //SQL Statement
-        private readonly List<string> _sql = new List<string>();         
+        private readonly List<string> _sql = new List<string>();
+        //private readonly List<SqlCommand> _csql = new List<SqlCommand>();
 
         public X2(string cs, bool isDebug, int uid = 0)
         {
@@ -93,7 +95,7 @@ namespace cKernel
         {  
             // Kiem tra va lay action
             if (_r._e) return this;
-            if (!String.IsNullOrEmpty(_robj._a))
+            if (!string.IsNullOrEmpty(_robj._a))
             {
                 if (_cda.ContainsKey(_robj._a))
                 {
@@ -123,7 +125,7 @@ namespace cKernel
         {
             if (_r._e) return this;
             var fi = L(value, 7, 0, _fs.Length, _fs);
-            if (!String.IsNullOrEmpty(fi))
+            if (!string.IsNullOrEmpty(fi))
             {
                 _p[_pIdx] = new[] { value, fi };
                 _pIdx++;
@@ -143,7 +145,7 @@ namespace cKernel
         /// <returns></returns>
         public string L(string k, int i, int j, int l, string[][] f)
         {
-            for (var m = 0; m < l; m++) if (f[m][i] == k) return f[m][j]; return String.Empty;
+            for (var m = 0; m < l; m++) if (f[m][i] == k) return f[m][j]; return string.Empty;
         }
 
         /// <summary>
@@ -157,7 +159,7 @@ namespace cKernel
             {
                 if(_robj._c.Any())
                 {
-                    if (_robj._c.Any(i => String.IsNullOrEmpty(L(i.Key, 0, 0, _p.Length, _p))))
+                    if (_robj._c.Any(i => string.IsNullOrEmpty(L(i.Key, 0, 0, _p.Length, _p))))
                     {
                         _r._s = 0;
                         _r._m = _E.E10006.G(_isDebug, null);
@@ -173,7 +175,7 @@ namespace cKernel
             {
                 if (_robj._mc.Any())
                 {
-                    if (_robj._mc.Any(c => c.Any(i => String.IsNullOrEmpty(L(i.Key, 0, 0, _p.Length, _p)))))
+                    if (_robj._mc.Any(c => c.Any(i => string.IsNullOrEmpty(L(i.Key, 0, 0, _p.Length, _p)))))
                     {
                         _r._s = 0;
                         _r._m = _E.E10006.G(_isDebug, null);
@@ -203,7 +205,7 @@ namespace cKernel
             {
                 if (_robj._d.Any())
                 {
-                    if (_robj._d.Any(i => String.IsNullOrEmpty(L(i.Key, 7, 0, _fs.Length, _fs))))
+                    if (_robj._d.Any(i => string.IsNullOrEmpty(L(i.Key, 7, 0, _fs.Length, _fs))))
                     {
                         _r._s = 0;
                         _r._m = _E.E10007.G(_isDebug, null);
@@ -223,7 +225,7 @@ namespace cKernel
             {
                 if(_robj._md.Any())
                 {
-                    if (_robj._md.Any(d => d.Any(i => String.IsNullOrEmpty(L(i.Key, 7, 0, _fs.Length, _fs)))))
+                    if (_robj._md.Any(d => d.Any(i => string.IsNullOrEmpty(L(i.Key, 7, 0, _fs.Length, _fs)))))
                     {
                         _r._s = 0;
                         _r._m = _E.E10007.G(_isDebug, null);
@@ -244,7 +246,7 @@ namespace cKernel
             }
 
             //Assign field
-            _f = !String.IsNullOrEmpty(_robj._f) ? _robj._f : "*";
+            _f = !string.IsNullOrEmpty(_robj._f) ? _robj._f : "*";
 
             return this;
         }
@@ -276,7 +278,7 @@ namespace cKernel
                     i = 0;
                     foreach (var c in _robj._c)
                     {
-                        _c[0][i] = new[] {c.Key, L(c.Key, 7, 0, _fs.Length, _fs), String.Format("{0}", c.Value)};
+                        _c[0][i] = new[] {c.Key, L(c.Key, 7, 0, _fs.Length, _fs), string.Format("{0}", c.Value)};
                         i++;
                     }
                    
@@ -290,7 +292,7 @@ namespace cKernel
                     i = 0;
                     foreach (var d in _robj._d)
                     {
-                        _d[0][i] = new[] { d.Key, L(d.Key, 7, 0, _fs.Length, _fs), String.Format("{0}", d.Value) };
+                        _d[0][i] = new[] { d.Key, L(d.Key, 7, 0, _fs.Length, _fs), string.Format("{0}", d.Value) };
                         i++;
                     }
                 }
@@ -308,7 +310,7 @@ namespace cKernel
                         foreach (var item in c)
                         {
                             _c[i][j] = new[]
-                            {item.Key, L(item.Key, 7, 0, _fs.Length, _fs), String.Format("{0}", item.Value)};
+                            {item.Key, L(item.Key, 7, 0, _fs.Length, _fs), string.Format("{0}", item.Value)};
                             j++;
                         }
                         i++;
@@ -327,7 +329,7 @@ namespace cKernel
                         var j = 0;
                         foreach (var item in d)
                         {
-                            _d[i][j] = new[] { item.Key, L(item.Key, 7, 0, _fs.Length, _fs), String.Format("{0}", item.Value) };
+                            _d[i][j] = new[] { item.Key, L(item.Key, 7, 0, _fs.Length, _fs), string.Format("{0}", item.Value) };
                             j++;
                         }
                         i++;
@@ -340,7 +342,7 @@ namespace cKernel
             i = 0;
             foreach (var od in _robj._od)
             {
-                _od[i] = new[] {od.Key, L(od.Key, 7, 0, _fs.Length, _fs), String.Format("{0}", od.Value)};
+                _od[i] = new[] {od.Key, L(od.Key, 7, 0, _fs.Length, _fs), string.Format("{0}", od.Value)};
                 i++;
             }
 
@@ -378,7 +380,7 @@ namespace cKernel
         /// <param name="os"></param>
         public void G(string v, string f, string[][][] c, string[][] od, int? lm, int? os)
         {
-            var cond = String.Empty;
+            var cond = string.Empty;
             var fcond = c.FirstOrDefault(i => i != null);
             if (fcond != null)
             {
@@ -386,13 +388,13 @@ namespace cKernel
             }
             var order = LOD(od, od.Length);
             var limit = LLO(lm, os);
-            var sql = String.Format("SELECT {0} FROM {1} {2} {3} {4}", _f, v, cond, order, limit);
+            var sql = string.Format("SELECT {0} FROM {1} {2} {3} {4}", _f, v, cond, order, limit);
             _sql.Add(sql.Trim(new[] { ' ' }));
         }
 
         public void PG(string v, string f, string[][][] c, string[][] od, int? lm, int? os)
         {
-            var cond = String.Empty;
+            var cond = string.Empty;
             var fcond = c.FirstOrDefault(i => i != null);
             if (fcond != null)
             {
@@ -400,7 +402,7 @@ namespace cKernel
                 //_sql.Add(String.Format("EXEC {0} @table = {1}, @column = {2}, @sort = {3}, @filter = {4}, @index = {5}, @numOfRow = {6}", "GetPaginationData", v, _f, LOD()  LSP(fcond, fcond.Length)));
             }
             var order = LOD(od, od.Length);
-            var sql = String.Format("EXEC {0} @table = {1}, @column = {2}, @sort = {3}, @filter = {4}, @index = {5}, @numOfRow = {6}", "GetPaginationData", v, _f, order, cond, os.HasValue ? os.Value : 0, lm.HasValue ? lm.Value : 1000);
+            var sql = string.Format("EXEC {0} @table = {1}, @column = {2}, @sort = {3}, @filter = {4}, @index = {5}, @numOfRow = {6}", "GetPaginationData", v, _f, order, cond, os.HasValue ? os.Value : 0, lm.HasValue ? lm.Value : 1000);
             _sql.Add(sql.Trim(new[] { ' ' }));
         }
 
@@ -418,20 +420,20 @@ namespace cKernel
                 if (f[i] == null) continue;
                 string x;
                 if (f[i][2].Trim().IndexOf("$x", StringComparison.Ordinal) != -1)
-                    x = f[i][2].Replace("$x", f[i][0]);
+                    x = f[i][2].Replace("$x", string.Format("[{0}]",f[i][0]));
                 else
                 {
                     switch (f[i][1][0])
                     {
                         case '0':
                         case '1':
-                            x = f[i][0] + "=" + f[i][2];
+                            x = string.Format("[{0}]", f[i][0]) + "=" + f[i][2];
                             break;
                         case '5':
-                            x = f[i][0] + "=" + (string.IsNullOrEmpty(f[i][2]) ? "NULL" : "'" + f[i][2] + "'");
+                            x = string.Format("[{0}]", f[i][0]) + "=" + (string.IsNullOrEmpty(f[i][2]) ? "NULL" : "'" + f[i][2] + "'");
                             break;
                         default:
-                            x = f[i][0] + "=" + (string.IsNullOrEmpty(f[i][2]) ? "NULL" : "N'" + SlashQuote(f[i][2]) + "'");
+                            x = string.Format("[{0}]", f[i][0]) + "=" + (string.IsNullOrEmpty(f[i][2]) ? "NULL" : "N'" + SlashQuote(f[i][2]) + "'");
                             break;
 
                     }
@@ -450,7 +452,7 @@ namespace cKernel
             for (var i = 0; i < l; i++)
             {
                 if (f[i] == null) continue;
-                var x = String.Format("{0} {1}", f[i][0], f[i][2]);
+                var x = string.Format("{0} {1}", f[i][0], f[i][2]);
                 if (r == "") r += " ORDER BY " + x;
                 else r += " , " + x;
             }
@@ -462,7 +464,7 @@ namespace cKernel
             var r = "";
             if (lm.HasValue && os.HasValue)
             {
-                r = String.Format(" LIMIT {0} OFFSET {1}", lm.Value, os.Value);
+                r = string.Format(" LIMIT {0} OFFSET {1}", lm.Value, os.Value);
             }
             return r;
         }
@@ -480,12 +482,11 @@ namespace cKernel
                 if (item != null)
                 {
                     var r = LI(item);
-                    _sql.Add(String.Format("INSERT {0} ({1}) VALUES ({2}); SELECT SCOPE_IDENTITY()", v, r[0], r[1]));
+                    _sql.Add(String.Format("INSERT INTO {0} ({1}) VALUES ({2}); SELECT SCOPE_IDENTITY()", v, r[0], r[1]));
                 }
             }
            
         }
-
         /// <summary>
         /// Look up insert value
         /// </summary>
@@ -494,25 +495,29 @@ namespace cKernel
         public string[] LI(string[][] f)
         {
             string[] r = { "", "" };
+
             foreach (var t1 in f.Where(t1 => !t1[0].Equals("Id")))
             {
-                if (r[0] == "") r[0] += t1[0]; else r[0] += "," + t1[0];
+                if (r[0] == "") r[0] += string.Format("[{0}]",t1[0]); else r[0] += "," + string.Format("[{0}]", t1[0]);
 
                 string t;
                 switch (t1[1][0])
                 {
                     case '0':
                     case '1':
-                        t = String.IsNullOrEmpty(t1[2]) ? "NULL" : t1[2];
+                        t = string.IsNullOrEmpty(t1[2]) ? "NULL" : t1[2];
+                        //d.Parameters.Add(new SqlParameter(t1[0], SqlDbType.Int) {
+                        //    Value = t1[2]
+                        //});
                         break;
                     //case '4':
                     //    t = String.IsNullOrEmpty(t1[2]) ? "NULL" : "N'" + t1[2].Replace("'","\'") + "'";
                     //    break;
                     case '5':
-                        t = String.IsNullOrEmpty(t1[2]) ? "NULL" : "'" + t1[2] + "'";
+                        t = string.IsNullOrEmpty(t1[2]) ? "NULL" : "'" + t1[2] + "'";
                         break;
                     default:
-                        t = String.IsNullOrEmpty(t1[2]) ? "NULL" : "N'" + SlashQuote(t1[2]) + "'";
+                        t = string.IsNullOrEmpty(t1[2]) ? "NULL" : "N'" + SlashQuote(t1[2]) + "'";
                         break;
                 }
                 //var t = (t1[1][0] == '0' || t1[1][0] == '1') ? t1[2] : ("N'" + t1[2] + "'");
@@ -521,7 +526,7 @@ namespace cKernel
 
             if (f.Any(t1 => t1[0].Equals("IsPrgCreatedUserId")) || _loggedUserId <= 0) return r;
 
-            if (!String.IsNullOrEmpty(L("IsPrgCreatedUserId", 7, 0, _fs.Length, _fs)))
+            if (!string.IsNullOrEmpty(L("IsPrgCreatedUserId", 7, 0, _fs.Length, _fs)))
             {
                 if (r[0] == "") r[0] += "IsPrgCreatedUserId"; else r[0] += "," + "IsPrgCreatedUserId";
                 if (r[1] == "") r[1] += _loggedUserId; else r[1] += "," + _loggedUserId;
@@ -529,12 +534,53 @@ namespace cKernel
 
             if(f.Any(t1 => t1[0].Equals("IsPrgCreatedDate"))) return r;
 
-            if (String.IsNullOrEmpty(L("IsPrgCreatedDate", 7, 0, _fs.Length, _fs))) return r;
+            if (string.IsNullOrEmpty(L("IsPrgCreatedDate", 7, 0, _fs.Length, _fs))) return r;
             if (r[0] == "") r[0] += "IsPrgCreatedDate"; else r[0] += "," + "IsPrgCreatedDate";
-            if (r[1] == "") r[1] += String.Format("'{0:yyyy-MM-ddTHH:mm:ss.000}'", DateTime.Now); else r[1] += "," + String.Format("'{0:yyyy-MM-ddTHH:mm:ss.000}'", DateTime.Now);
+            if (r[1] == "") r[1] += string.Format("'{0:yyyy-MM-ddTHH:mm:ss.000}'", DateTime.Now); else r[1] += "," + string.Format("'{0:yyyy-MM-ddTHH:mm:ss.000}'", DateTime.Now);
 
             return r;
         }
+        //public string[] LIP(string[][] f, out SqlParameter[] pc) //Lookup params
+        //{
+        //    pc = new SqlParameter[f.Where(t1 => !t1[0].Equals("Id")).Count()];
+        //    string[] r = { "", "" };
+        //    var idx = 0;
+        //    foreach (var t1 in f.Where(t1 => !t1[0].Equals("Id")))
+        //    {
+        //        if (r[0] == "")
+        //            r[0] += string.Format("[{0}]", t1[0]);
+        //        else
+        //            r[0] += "," + string.Format("[{0}]", t1[0]);
+        //        if (r[1] == "")
+        //            r[1] += string.Format("@{0}", t1[0]);
+        //        else
+        //            r[1] += "," + string.Format("@{0}", t1[0]);
+
+        //        pc[idx] = new SqlParameter(t1[0], t1[2]);
+        //        idx++;
+        //    }
+
+        //    if (f.Any(t1 => t1[0].Equals("IsPrgCreatedUserId")) || _loggedUserId <= 0) return r;
+        //    if (!string.IsNullOrEmpty(L("IsPrgCreatedUserId", 7, 0, _fs.Length, _fs)))
+        //    {
+        //        if (r[0] == "") r[0] += "[IsPrgCreatedUserId]"; else r[0] += "," + "[IsPrgCreatedUserId]";
+        //        if (r[1] == "") r[1] += "@IsPrgCreatedUserId"; else r[1] += "," + "@IsPrgCreatedUserId";
+        //        //if (r[1] == "") r[1] += _loggedUserId; else r[1] += "," + _loggedUserId;
+        //        pc[idx] = new SqlParameter("IsPrgCreatedUserId", _loggedUserId);
+        //        idx++;
+        //    }
+
+        //    if (f.Any(t1 => t1[0].Equals("IsPrgCreatedDate"))) return r;
+        //    if (!string.IsNullOrEmpty(L("IsPrgCreatedDate", 7, 0, _fs.Length, _fs)))
+        //    {
+        //        if (r[0] == "") r[0] += "[IsPrgCreatedDate]"; else r[0] += "," + "[IsPrgCreatedDate]";
+        //        if (r[1] == "") r[1] += "@IsPrgCreatedDate"; else r[1] += "," + "@IsPrgCreatedDate";
+        //        //if (r[1] == "") r[1] += string.Format("'{0:yyyy-MM-ddTHH:mm:ss.000}'", DateTime.Now); else r[1] += "," + string.Format("'{0:yyyy-MM-ddTHH:mm:ss.000}'", DateTime.Now);
+        //        pc[idx] = new SqlParameter("IsPrgCreatedDate", string.Format("'{0:yyyy-MM-ddTHH:mm:ss.000}'", DateTime.Now));
+        //        idx++;
+        //    }
+        //    return r;
+        //}
 
         /// <summary>
         /// Generate update statement
@@ -548,7 +594,7 @@ namespace cKernel
             {
                 if (c[i] != null)
                 {
-                    _sql.Add(String.Format("UPDATE {0} SET {1} {2}; SELECT @@ROWCOUNT", v, LU(d[i]), LU(c[i], c[i].Length)));
+                    _sql.Add(string.Format("UPDATE {0} SET {1} {2}; SELECT @@ROWCOUNT", v, LU(d[i]), LU(c[i], c[i].Length)));
                 }
             }
         }
@@ -564,23 +610,23 @@ namespace cKernel
             foreach (var t1 in f.Where(t1 => !t1[0].Equals("Id")))
             {
                 string t;
-                if (t1[2].Trim().IndexOf("$x", StringComparison.Ordinal) != -1) t = t1[2].Replace("$x", t1[0]);
+                if (t1[2].Trim().IndexOf("$x", StringComparison.Ordinal) != -1) t = t1[2].Replace("$x", string.Format("[{0}]",t1[0]));
                 else
                 {
                     switch (t1[1][0])
                     {
                         case '0':
                         case '1':
-                            t = String.IsNullOrEmpty(t1[2]) ? t1[0] + "= NULL" : t1[0] + "=" + t1[2];
+                            t = string.IsNullOrEmpty(t1[2]) ? string.Format("[{0}]", t1[0]) + "= NULL" : string.Format("[{0}]", t1[0]) + "=" + t1[2];
                             break;
                         //case '4':
                         //    t = String.IsNullOrEmpty(t1[2]) ? t1[0] + "=" + "NULL" : t1[0] + "=" + "N'" + t1[2].Replace("'", "\'") + "'";
                         //    break;
                         case '5':
-                            t = String.IsNullOrEmpty(t1[2]) ? t1[0] + "=" + "NULL" : t1[0] + "=" + "'" + t1[2] + "'";
+                            t = string.IsNullOrEmpty(t1[2]) ? string.Format("[{0}]", t1[0]) + "=" + "NULL" : string.Format("[{0}]", t1[0]) + "=" + "'" + t1[2] + "'";
                             break;
                         default:
-                            t = String.IsNullOrEmpty(t1[2]) ? t1[0] + "=" + "NULL" : t1[0] + "=" + "N'" + SlashQuote(t1[2]) + "'";
+                            t = string.IsNullOrEmpty(t1[2]) ? string.Format("[{0}]", t1[0]) + "=" + "NULL" : string.Format("[{0}]", t1[0]) + "=" + "N'" + SlashQuote(t1[2]) + "'";
                             //t = t1[0] + "=" + "N'" + t1[2] + "'";
                             break;
                     }
@@ -592,15 +638,15 @@ namespace cKernel
 
             if (f.Any(t1 => t1[0].Equals("IsPrgUpdatedUserId")) || _loggedUserId <= 0) return r;
 
-            if (!String.IsNullOrEmpty(L("IsPrgUpdatedUserId", 7, 0, _fs.Length, _fs)))
+            if (!string.IsNullOrEmpty(L("IsPrgUpdatedUserId", 7, 0, _fs.Length, _fs)))
             {
-                if (r == "") r += String.Format("IsPrgUpdatedUserId = {0}", _loggedUserId); else r += "," + String.Format("IsPrgUpdatedUserId = {0}", _loggedUserId);
+                if (r == "") r += string.Format("IsPrgUpdatedUserId = {0}", _loggedUserId); else r += "," + string.Format("IsPrgUpdatedUserId = {0}", _loggedUserId);
             }
 
             if (f.Any(t1 => t1[0].Equals("IsPrgUpdatedDate"))) return r;
 
-            if (String.IsNullOrEmpty(L("IsPrgUpdatedDate", 7, 0, _fs.Length, _fs))) return r;
-            if (r == "") r += String.Format("IsPrgUpdatedDate = '{0:yyyy-MM-ddTHH:mm:ss.000}'", DateTime.Now); else r += "," + String.Format("IsPrgUpdatedDate = '{0:yyyy-MM-ddTHH:mm:ss.000}'", DateTime.Now);
+            if (string.IsNullOrEmpty(L("IsPrgUpdatedDate", 7, 0, _fs.Length, _fs))) return r;
+            if (r == "") r += string.Format("IsPrgUpdatedDate = '{0:yyyy-MM-ddTHH:mm:ss.000}'", DateTime.Now); else r += "," + string.Format("IsPrgUpdatedDate = '{0:yyyy-MM-ddTHH:mm:ss.000}'", DateTime.Now);
 
             return r;
         }
@@ -653,7 +699,7 @@ namespace cKernel
             {
                 if (item != null)
                 {
-                    _sql.Add(String.Format("DELETE FROM {0} {1}", v, LW(item, item.Length)));
+                    _sql.Add(string.Format("DELETE FROM {0} {1}", v, LW(item, item.Length)));
                 }
             }
         }
@@ -668,7 +714,7 @@ namespace cKernel
             var fcond = c.FirstOrDefault(i => i != null);
             if (fcond != null)
             {
-                _sql.Add(String.Format("EXEC {0} {1}", sp, LSP(fcond, fcond.Length)));
+                _sql.Add(string.Format("EXEC {0} {1}", sp, LSP(fcond, fcond.Length)));
             }
             
         }
@@ -703,7 +749,7 @@ namespace cKernel
                     }
                 }
                 //x = f[i][0] + "=" + ((f[i][1][0] == '0' || f[i][1][0] == '1') ? f[i][2] : ("N'" + f[i][2] + "'"));
-                r += String.Format("@{0},", x);
+                r += string.Format("@{0},", x);
                 //break;
             }
             return r.Trim(new []{','});
@@ -748,7 +794,7 @@ namespace cKernel
                 try
                 {
                     //case 'G': G(v, _f, _c, _od, _robj._lm, _robj._os); break;
-                    var cond = String.Empty;
+                    var cond = string.Empty;
                     var fcond = _c.FirstOrDefault(i => i != null);
                     if (fcond != null)
                     {
@@ -816,7 +862,7 @@ namespace cKernel
 
                 try
                 {
-                    var statement = sql.FirstOrDefault(i => !String.IsNullOrEmpty(i));
+                    var statement = sql.FirstOrDefault(i => !string.IsNullOrEmpty(i));
                     if (statement != null)
                     {
                         command.CommandText = statement;
@@ -864,7 +910,7 @@ namespace cKernel
                     _r._d = new List<object[]>();
                     foreach (var item in sql)
                     {
-                        if (String.IsNullOrEmpty(item)) continue;
+                        if (string.IsNullOrEmpty(item)) continue;
                         command.CommandText = item;
                         //var result = command.ExecuteNonQuery();
                         var result = command.ExecuteScalar();
@@ -883,6 +929,96 @@ namespace cKernel
             }
         }
 
+        //public void EXCQ(List<SqlCommand> sql)
+        //{
+        //    var result = new DataTable();
+        //    using (var con = new SqlConnection(_cs))
+        //    {
+        //        con.Open();
+
+        //        //var command = con.CreateCommand();
+
+        //        // Start a local transaction.
+        //        var transaction = con.BeginTransaction("EXCQ");
+
+        //        // Must assign both transaction object and connection 
+        //        // to Command object for a pending local transaction
+        //        //command.Connection = con;
+        //        //command.Transaction = transaction;
+
+        //        try
+        //        {
+        //            //var statement = sql.FirstOrDefault(i => !string.IsNullOrEmpty(i));
+        //            var statement = sql.FirstOrDefault();
+        //            if (statement != null)
+        //            {
+        //                //command.CommandText = statement;
+        //                statement.Connection = con;
+        //                statement.Transaction = transaction;
+        //                var adap = new SqlDataAdapter(statement);
+        //                adap.Fill(result);
+        //                var list = new List<object[]>();
+        //                for (var m = 0; m < result.Rows.Count; m++) list.Add(result.Rows[m].ItemArray);
+        //                _r._d = list; _r._t = result.Rows.Count;
+        //            }
+        //            // Attempt to commit the transaction.
+        //            transaction.Commit();
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            _r._s = 0; _r._m = _E.E10009.G(_isDebug, ex);
+
+        //            //Rollback
+        //            transaction.Rollback();
+        //        }
+        //    }
+        //}
+
+        //public void EXCNQ(List<SqlCommand> sql)
+        //{
+        //    using (var con = new SqlConnection(_cs))
+        //    {
+        //        con.Open();
+
+        //        //var command = con.CreateCommand();
+
+        //        // Start a local transaction.
+        //        var transaction = con.BeginTransaction("EXCNQ");
+
+        //        // Must assign both transaction object and connection 
+        //        // to Command object for a pending local transaction
+        //        //command.Connection = con;
+        //        //command.Transaction = transaction;
+
+        //        try
+        //        {
+        //            _r._d = new List<object[]>();
+        //            foreach (var item in sql)
+        //            {
+        //                item.Connection = con;
+        //                item.Transaction = transaction;
+        //                var result = item.ExecuteScalar();
+        //                _r._d.Add(new[] { result });
+
+        //                //if (string.IsNullOrEmpty(item)) continue;
+        //                //command.CommandText = item;
+        //                ////var result = command.ExecuteNonQuery();
+        //                //var result = command.ExecuteScalar();
+        //                //_r._d.Add(new[] { result });
+        //            }
+        //            // Attempt to commit the transaction.
+        //            transaction.Commit();
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            _r._s = 0; _r._m = _E.E10009.G(_isDebug, ex);
+
+        //            //Rollback
+        //            transaction.Rollback();
+        //        }
+        //    }
+        //}
+
         /// <summary>
         /// Check order
         /// </summary>
@@ -893,7 +1029,7 @@ namespace cKernel
             if (_robj._od == null) return this;
             if(_robj._od.Any())
             {
-                if (_robj._od.Any(i => String.IsNullOrEmpty(L(i.Key, 7, 0, _fs.Length, _fs))))
+                if (_robj._od.Any(i => string.IsNullOrEmpty(L(i.Key, 7, 0, _fs.Length, _fs))))
                 {
                     _r._s = 0; _r._m = _E.E10012.G(_isDebug, null);
                 }
@@ -936,7 +1072,8 @@ namespace cKernel
 
         public string SlashQuote(string str)
         {
-            return str.Replace("'", @"''");
+           return Regex.Replace(str, "^\'$", "\'\'");
+            //return str.Replace("'", @"''");
         }
     }
 }

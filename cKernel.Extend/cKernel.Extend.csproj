@@ -39,6 +39,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\cDict\cDict.csproj">
+      <Project>{fbd0a9ae-a130-40b4-b860-9358b073acd6}</Project>
+      <Name>cDict</Name>
+    </ProjectReference>
     <ProjectReference Include="..\cKernel\cKernel.csproj">
       <Project>{7a0a80e9-e1c8-4817-a078-ace4f00919ae}</Project>
       <Name>cKernel</Name>
