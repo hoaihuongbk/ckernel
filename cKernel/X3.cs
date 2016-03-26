@@ -439,9 +439,25 @@ namespace cKernel
                 else
                 {
                     x = string.Format("[{0}] = @{0}", f[i][0]);
-                    pc.Add(new SqlParameter(f[i][0], LT(f[i][1])) {
-                        Value = f[i][2]
+
+                    var tp = LT(f[i][1]);
+                    object v = f[i][2];
+                    switch (tp)
+                    {
+                        case SqlDbType.Bit:
+                            v = f[i][2].Equals("1") || f[i][2].Equals("True");
+                            break;
+                        default:
+                            break;
+                    }
+                    pc.Add(new SqlParameter(f[i][0], tp)
+                    {
+                        Value = v
                     });
+
+                    //pc.Add(new SqlParameter(f[i][0], LT(f[i][1])) {
+                    //    Value = f[i][2]
+                    //});
                 }
                 if (r == "") r += " WHERE " + x; else r += " AND " + x;
             }
@@ -502,9 +518,19 @@ namespace cKernel
                 else
                     r[1] += "," + string.Format("@{0}", t1[0]);
 
-                pc.Add(new SqlParameter(t1[0], LT(t1[1]))
+                var t = LT(t1[1]);
+                object v = t1[2];
+                switch (t)
                 {
-                    Value = t1[2]
+                    case SqlDbType.Bit:
+                        v = t1[2].Equals("1") || t1[2].Equals("True");
+                        break;
+                    default:
+                        break;
+                }
+                pc.Add(new SqlParameter(t1[0], t )
+                {
+                    Value = v
                 });
             }
 
@@ -573,9 +599,25 @@ namespace cKernel
                 else
                 {
                     t = string.Format("[{0}] = @{0}",t1[0]);
-                    pc.Add(new SqlParameter(t1[0], LT(t1[1])) {
-                        Value = t1[2]
+
+                    var tp = LT(t1[1]);
+                    object v = t1[2];
+                    switch (tp)
+                    {
+                        case SqlDbType.Bit:
+                            v = t1[2].Equals("1") || t1[2].Equals("True");
+                            break;
+                        default:
+                            break;
+                    }
+                    pc.Add(new SqlParameter(t1[0], tp)
+                    {
+                        Value = v
                     });
+
+                    //pc.Add(new SqlParameter(t1[0], LT(t1[1])) {
+                    //    Value = t1[2]
+                    //});
                 }
                 if (r == "") r += t;
                 else r += ("," + t);
