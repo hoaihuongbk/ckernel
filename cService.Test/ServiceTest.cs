@@ -3,6 +3,7 @@ using System.Configuration;
 using cModel;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace cService.Test
 {
@@ -10,6 +11,8 @@ namespace cService.Test
     public class ServiceTest
     {
         private const string Cs = "server=112.213.84.183;database=FutaMarketing;uid=futadev;pwd=CNLuwcRhLT;";
+        private const string Cs2 = "server=112.213.84.183;database=FutaTest;uid=futadev;pwd=CNLuwcRhLT;";
+        private const string Cs3 = "server=112.213.84.183;database=FutaBooking;uid=futadev;pwd=CNLuwcRhLT";
         //private const string Cs = "server=118.69.196.250;database=FutaMarketing;uid=ftmarketing;pwd=dcSGNgIep0OAvXK8tFGO;";
 
 
@@ -133,6 +136,66 @@ namespace cService.Test
             }
             Assert.AreEqual(1, count);
         }
+        [TestMethod]
+        public void TestGetMethod5()
+        {
+            var count = 0;
+            try
+            {
+                var s = new S(Cs2);
+                var obj = new GCRequest()
+                {
+                    _a = "pGettbl_CPC_XE_OnlineSession_View_001",
+                    _c = new Dictionary<string, object>()
+                    {
+                        { "CurDate", "$x >= '2016-02-01T00:00:00.000' AND $x <= '2016-02-28T23:59:59.000'" },
+                        {"Status", "Success"},
+                    },
+                    _f = "Id,CustName,CustMobile,CustEmail,CustAddress,CustPickupOfficeId,CustCMND,BookingNo,NumberOfTicket,TuyenDuongId,NgayDi,GioDi,TotalMoney,CurDate,Status,PaymentType,ClientApp,PayStatus,MailStatus,SMSStatus,CustId,CanBoCapNhat,Discount,Total",
+                    _od = new Dictionary<string, string>()
+                    {
+                        {"CurDate", "DESC" }
+                    },
+                    _os = 0,
+                    _lm = 10
+                };
+                var robj = s.P(obj);
+                count = robj.Records.Count;
+            }
+            catch (Exception)
+            {
+
+            }
+            Assert.AreEqual(10, count);
+        }
+        [TestMethod]
+        public void TestGetMethod6()
+        {
+            var count = false;
+            try
+            {
+                var s = new S(Cs3);
+
+                var obj = new GCRequest()
+                {
+                    _a = "fGettbl_PaymentType",
+                    _c = new Dictionary<string, object>
+                        {
+                            {"Status", 1}
+                        },
+                    _f = "Code, Name"
+                };
+                var robj = s.P(obj);
+                count = robj.Records.Any();
+            }
+            catch (Exception)
+            {
+
+            }
+            Assert.AreEqual(true, count);
+        }
+
+
         [TestMethod]
         public void TestInsertMethod()
         {

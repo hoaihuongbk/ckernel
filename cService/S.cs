@@ -1,7 +1,8 @@
 ﻿using System;
-using cDict;
 using cKernel.Extend;
 using cModel;
+using cDict;
+
 namespace cService
 {
     // ReSharper disable InconsistentNaming

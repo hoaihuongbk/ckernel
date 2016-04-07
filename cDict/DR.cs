@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace cDict
+namespace cKernel
 {
     public class DR
     {

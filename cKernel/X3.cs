@@ -252,7 +252,7 @@ namespace cKernel
         }
         public string MF(string f)
         {
-            return string.Join(",", f.Split(',').Select(c => string.Format("[{0}]", c)));
+            return string.Join(",", f.Split(',').Where(c => !string.IsNullOrEmpty(c)).Select(c => string.Format("[{0}]", c.Trim())));
         }
 
         /// <summary>
@@ -405,7 +405,16 @@ namespace cKernel
                 cond = LW(fcond, fcond.Length, out pc);
                 foreach(var item in pc)
                 {
-                    cond = cond.Replace(string.Format("@{0}",item.ParameterName), Convert.ToString(item.Value));
+                    switch (item.SqlDbType)
+                    {
+                        case SqlDbType.VarChar:
+                        case SqlDbType.NVarChar:
+                            cond = cond.Replace(string.Format("@{0}", item.ParameterName), string.Format("'{0}'", item.Value));
+                            break;
+                        default:
+                            cond = cond.Replace(string.Format("@{0}", item.ParameterName), string.Format("{0}", item.Value));
+                            break;
+                    }
                 }
             }
             var order = LOD(od, od.Length);
