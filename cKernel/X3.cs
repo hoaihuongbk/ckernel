@@ -447,7 +447,7 @@ namespace cKernel
                     x = f[i][2].Replace("$x", string.Format("[{0}]",f[i][0]));
                 else
                 {
-                    x = string.Format("[{0}] = @{0}", f[i][0]);
+                    x = string.Format("[{0}] = @{0}", LPN(f[i][0]));
 
                     var tp = LT(f[i][1]);
                     object v = f[i][2];
@@ -459,19 +459,16 @@ namespace cKernel
                         default:
                             break;
                     }
-                    pc.Add(new SqlParameter(f[i][0], tp)
+                    pc.Add(new SqlParameter(LPN(f[i][0]), tp)
                     {
                         Value = v
                     });
-
-                    //pc.Add(new SqlParameter(f[i][0], LT(f[i][1])) {
-                    //    Value = f[i][2]
-                    //});
                 }
                 if (r == "") r += " WHERE " + x; else r += " AND " + x;
             }
             return r;
         }
+
         public string LOD(string[][] f, int l)
         {
             var r = "";
@@ -493,6 +490,11 @@ namespace cKernel
             }
             return r;
         }
+        public string LPN(string n, string prefix = "w")
+        {
+            return string.Format("{0}_{1}", prefix, n);
+        }
+
         #endregion
 
         #region Insert statement
@@ -523,9 +525,9 @@ namespace cKernel
                 else
                     r[0] += "," + string.Format("[{0}]", t1[0]);
                 if (r[1] == "")
-                    r[1] += string.Format("@{0}", t1[0]);
+                    r[1] += string.Format("@{0}", LPN(t1[0],"i"));
                 else
-                    r[1] += "," + string.Format("@{0}", t1[0]);
+                    r[1] += "," + string.Format("@{0}", LPN(t1[0],"i"));
 
                 var t = LT(t1[1]);
                 object v = t1[2];
@@ -537,7 +539,7 @@ namespace cKernel
                     default:
                         break;
                 }
-                pc.Add(new SqlParameter(t1[0], t )
+                pc.Add(new SqlParameter(LPN(t1[0], "i"), t )
                 {
                     Value = v
                 });
@@ -551,8 +553,8 @@ namespace cKernel
                     if(_loggedUserId > 0)
                     {
                         if (r[0] == "") r[0] += "[IsPrgCreatedUserId]"; else r[0] += "," + "[IsPrgCreatedUserId]";
-                        if (r[1] == "") r[1] += "@IsPrgCreatedUserId"; else r[1] += "," + "@IsPrgCreatedUserId";
-                        pc.Add(new SqlParameter("IsPrgCreatedUserId", SqlDbType.Int) {
+                        if (r[1] == "") r[1] += "@i_IsPrgCreatedUserId"; else r[1] += "," + "@i_IsPrgCreatedUserId";
+                        pc.Add(new SqlParameter("i_IsPrgCreatedUserId", SqlDbType.Int) {
                             Value = _loggedUserId
                         });
                     }
@@ -563,8 +565,8 @@ namespace cKernel
                 if (!string.IsNullOrEmpty(L("IsPrgCreatedDate", 7, 0, _fs.Length, _fs)))
                 {
                     if (r[0] == "") r[0] += "[IsPrgCreatedDate]"; else r[0] += "," + "[IsPrgCreatedDate]";
-                    if (r[1] == "") r[1] += "@IsPrgCreatedDate"; else r[1] += "," + "@IsPrgCreatedDate";
-                    pc.Add(new SqlParameter("IsPrgCreatedDate", SqlDbType.DateTime) {
+                    if (r[1] == "") r[1] += "@i_IsPrgCreatedDate"; else r[1] += "," + "@i_IsPrgCreatedDate";
+                    pc.Add(new SqlParameter("i_IsPrgCreatedDate", SqlDbType.DateTime) {
                         Value = DateTime.Now
                     });
                 }
@@ -607,7 +609,7 @@ namespace cKernel
                     t = t1[2].Replace("$x", string.Format("[{0}]",t1[0]));
                 else
                 {
-                    t = string.Format("[{0}] = @{0}",t1[0]);
+                    t = string.Format("[{0}] = @{0}", LPN(t1[0],"u"));
 
                     var tp = LT(t1[1]);
                     object v = t1[2];
@@ -619,14 +621,10 @@ namespace cKernel
                         default:
                             break;
                     }
-                    pc.Add(new SqlParameter(t1[0], tp)
+                    pc.Add(new SqlParameter(LPN(t1[0], "u"), tp)
                     {
                         Value = v
                     });
-
-                    //pc.Add(new SqlParameter(t1[0], LT(t1[1])) {
-                    //    Value = t1[2]
-                    //});
                 }
                 if (r == "") r += t;
                 else r += ("," + t);
@@ -640,10 +638,10 @@ namespace cKernel
                     if(_loggedUserId > 0)
                     {
                         if (r == "")
-                            r += "[IsPrgUpdatedUserId] = @IsPrgUpdatedUserId";
+                            r += "[IsPrgUpdatedUserId] = @u_IsPrgUpdatedUserId";
                         else
-                            r += ",[IsPrgUpdatedUserId] = @IsPrgUpdatedUserId";
-                        pc.Add(new SqlParameter("IsPrgUpdatedUserId", SqlDbType.Int) {
+                            r += ",[IsPrgUpdatedUserId] = @u_IsPrgUpdatedUserId";
+                        pc.Add(new SqlParameter("u_IsPrgUpdatedUserId", SqlDbType.Int) {
                             Value = _loggedUserId
                         });
                     }
@@ -655,10 +653,10 @@ namespace cKernel
                 if (!string.IsNullOrEmpty(L("IsPrgUpdatedDate", 7, 0, _fs.Length, _fs)))
                 {
                     if (r == "")
-                        r += "[IsPrgUpdatedDate] = @IsPrgUpdatedDate";
+                        r += "[IsPrgUpdatedDate] = @u_IsPrgUpdatedDate";
                     else
-                        r += ",[IsPrgUpdatedDate] = @IsPrgUpdatedDate";
-                    pc.Add(new SqlParameter("IsPrgUpdatedDate", SqlDbType.DateTime) {
+                        r += ",[IsPrgUpdatedDate] = @u_IsPrgUpdatedDate";
+                    pc.Add(new SqlParameter("u_IsPrgUpdatedDate", SqlDbType.DateTime) {
                         Value = DateTime.Now
                     });
                 }
