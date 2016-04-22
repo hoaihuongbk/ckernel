@@ -14,6 +14,7 @@ namespace cService.Test
         private const string Cs2 = "server=112.213.84.183;database=FutaTest;uid=futadev;pwd=CNLuwcRhLT;";
         private const string Cs3 = "server=112.213.84.183;database=FutaBooking;uid=futadev;pwd=CNLuwcRhLT";
         private const string Cs4 = "server=118.69.196.250;database=Futa3rdTracking;uid=futa3rdtracking;pwd=OYsLdL10vRNP21mrtu6B;";
+        private const string Cs5 = "server=112.213.84.183;database=FutaTaxi;uid=futadev;pwd=CNLuwcRhLT;";
 
 
         [TestMethod]
@@ -352,6 +353,38 @@ namespace cService.Test
             }
             Assert.AreEqual(true, id > 0);
         }
+
+        [TestMethod]
+        public void TestInsertMethod6()
+        {
+            var id = 0;
+            try
+            {
+                //var target = string.Format("{0}-{1:yyyyMMddHHmmssffff}", "0902363330", DateTime.Now);
+                var s = new S(Cs5);
+                var obj = new GCRequest()
+                {
+                    _a = "Inserttbl_SMS",
+                    _d = new Dictionary<string, object>()
+                {
+                    {"Code", target  },
+                    {"PhoneNumber", "0902363330" },
+                    {"Message", "This is test" }
+                },
+                };
+                var robj = s.P(obj);
+                if (robj.Result.Equals(1))
+                {
+                    id = Convert.ToInt32(robj.Records[0][0]);
+                }
+            }
+            catch (Exception)
+            {
+
+            }
+            Assert.AreEqual(true, id > 0);
+        }
+
 
         [TestMethod]
         public void TestUpdateMethod()

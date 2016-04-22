@@ -4,7 +4,6 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using cModel;
-using System.Text.RegularExpressions;
 
 // ReSharper disable InconsistentNaming
 namespace cKernel
@@ -447,7 +446,7 @@ namespace cKernel
                     x = f[i][2].Replace("$x", string.Format("[{0}]",f[i][0]));
                 else
                 {
-                    x = string.Format("[{0}] = @{0}", LPN(f[i][0]));
+                    x = string.Format("[{0}] = @{1}", f[i][0], LPN(f[i][0]));
 
                     var tp = LT(f[i][1]);
                     object v = f[i][2];
@@ -609,7 +608,7 @@ namespace cKernel
                     t = t1[2].Replace("$x", string.Format("[{0}]",t1[0]));
                 else
                 {
-                    t = string.Format("[{0}] = @{0}", LPN(t1[0],"u"));
+                    t = string.Format("[{0}] = @{1}", t1[0], LPN(t1[0],"u"));
 
                     var tp = LT(t1[1]);
                     object v = t1[2];
@@ -723,7 +722,6 @@ namespace cKernel
 
         public void EXPQ(List<SqlCommand> sql)
         {
-            var result = new DataTable();
             using (var con = new SqlConnection(_cs))
             {
                 //Open connection
@@ -736,6 +734,7 @@ namespace cKernel
                     var statement = sql.FirstOrDefault();
                     if (statement != null)
                     {
+                        var result = new DataTable();
                         statement.Connection = con;
                         statement.Transaction = transaction;
                         var pIdOut = new SqlParameter("@total", SqlDbType.Int) { Direction = ParameterDirection.Output };
@@ -766,7 +765,7 @@ namespace cKernel
         }
         public void EXQ(List<SqlCommand> sql)
         {
-            var result = new DataTable();
+            
             using (var con = new SqlConnection(_cs))
             {
                 //Open connection
@@ -779,6 +778,7 @@ namespace cKernel
                     var statement = sql.FirstOrDefault();
                     if (statement != null)
                     {
+                        var result = new DataTable();
                         statement.Connection = con;
                         statement.Transaction = transaction;
                         var adap = new SqlDataAdapter(statement);
