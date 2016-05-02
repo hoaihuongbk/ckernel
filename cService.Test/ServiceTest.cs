@@ -15,7 +15,7 @@ namespace cService.Test
         private const string Cs3 = "server=112.213.84.183;database=FutaBooking;uid=futadev;pwd=CNLuwcRhLT";
         private const string Cs4 = "server=118.69.196.250;database=Futa3rdTracking;uid=futa3rdtracking;pwd=OYsLdL10vRNP21mrtu6B;";
         private const string Cs5 = "server=112.213.84.183;database=FutaTaxi;uid=futadev;pwd=CNLuwcRhLT;";
-
+        private const string Cs6 = "server=118.69.196.250;database=TicketOnline;uid=ticket;pwd=qweqw@#$@#sSDFSD(*(*_!#!@ds;";
 
         [TestMethod]
         public void TestGetMethod()
@@ -195,8 +195,33 @@ namespace cService.Test
             }
             Assert.AreEqual(true, count);
         }
+        [TestMethod]
+        public void TestGetMethod7()
+        {
+            var count = 0;
+            try
+            {
+                var s = new S(Cs5);
 
-    
+                var obj = new GCRequest()
+                {
+                    _a = "fGettbl_Driver",
+                    _c = new Dictionary<string, object>
+                    {
+                        {"Latitude", 10.770067}
+                    },
+                    _f = "Code, FullName"
+                };
+                var robj = s.P(obj);
+                count = robj.TotalRecordCount;
+            }
+            catch (Exception)
+            {
+
+            }
+            Assert.AreEqual(1, count);
+        }
+
 
         [TestMethod]
         public void TestInsertMethod()
@@ -358,6 +383,7 @@ namespace cService.Test
         public void TestInsertMethod6()
         {
             var id = 0;
+            var target = "";
             try
             {
                 //var target = string.Format("{0}-{1:yyyyMMddHHmmssffff}", "0902363330", DateTime.Now);
@@ -444,6 +470,33 @@ namespace cService.Test
 
             }
             Assert.AreEqual(4, setId);
+        }
+        [TestMethod]
+        public void TestSPMethod2()
+        {
+            var setId = 0;
+            try
+            {
+                var s = new S(Cs6);
+                var obj = new GCRequest()
+                {
+                    _a = "sslyt_GetReportAsTable",
+                    _c = new Dictionary<string, object>()
+                    {
+                        {"Period", 14 }
+                    },
+                };
+                var robj = s.P(obj);
+                if (robj.Result.Equals(1))
+                {
+                    setId = robj.TotalRecordCount;
+                }
+            }
+            catch (Exception)
+            {
+
+            }
+            Assert.AreEqual(14, setId);
         }
     }
 }

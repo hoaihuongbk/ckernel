@@ -467,6 +467,7 @@ namespace cKernel
             }
             return r;
         }
+        
 
         public string LOD(string[][] f, int l)
         {
@@ -692,14 +693,45 @@ namespace cKernel
                 var cmd = new SqlCommand() {
                     CommandType = CommandType.StoredProcedure
                 };
-                List<SqlParameter> pc;
-                var param = LW(fcond, fcond.Length, out pc);
+                List<SqlParameter> pc = LWSP(fcond, fcond.Length);
                 cmd.CommandText = sp;
                 cmd.Parameters.AddRange(pc.ToArray());
                 _sql.Add(cmd);
             }
             
         }
+        public List<SqlParameter> LWSP(string[][] f, int l)
+        {
+            var pc = new List<SqlParameter>();
+            for (var i = 0; i < l; i++)
+            {
+                if (f[i] == null) continue;
+                if (f[i][2].Trim().IndexOf("$x", StringComparison.Ordinal) != -1)
+                    pc.Add(new SqlParameter(f[i][0], SqlDbType.NVarChar)
+                    {
+                        Value = f[i][2].Replace("$x", string.Format("[{0}]", f[i][0]))
+                    });
+                else
+                {
+                    var tp = LT(f[i][1]);
+                    object v = f[i][2];
+                    switch (tp)
+                    {
+                        case SqlDbType.Bit:
+                            v = f[i][2].Equals("1") || f[i][2].Equals("True");
+                            break;
+                        default:
+                            break;
+                    }
+                    pc.Add(new SqlParameter(f[i][0], tp)
+                    {
+                        Value = v
+                    });
+                }
+            }
+            return pc;
+        }
+
         #endregion
 
 
