@@ -222,6 +222,38 @@ namespace cService.Test
             Assert.AreEqual(1, count);
         }
 
+        [TestMethod]
+        public void TestGetMethod8()
+        {
+            var count = 0;
+            try
+            {
+                var s = new S(Cs5);
+
+                var obj = new GCRequest()
+                {
+                    _a = "pGettbl_Ticket_FavouriteLocation_View",
+                    _c = new Dictionary<string, object>
+                    {
+                        {"CustId", 1}
+                    },
+                    _f = "SrcLat,SrcLng,DestLat,DestLng,NumTicket",
+                    _od = new Dictionary<string, string>()
+                    {
+                        {"NumTicket", "DESC" }
+                    },
+                    _os = 0,
+                    _lm = 10
+                };
+                var robj = s.P(obj);
+                count = robj.TotalRecordCount;
+            }
+            catch (Exception)
+            {
+
+            }
+            Assert.AreEqual(4, count);
+        }
 
         [TestMethod]
         public void TestInsertMethod()
