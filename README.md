@@ -5,6 +5,9 @@ Single point for all CRUD api
 ## Usage
 
 Using tool for build dictionary and DLL for your project.
+
+## Example API
+
 ```csharp
 var service = new S(connectionString, isDebug, uid); //isDebug = true -> show error message in response object, uid is logged user id
 var obj = new GCRequest
