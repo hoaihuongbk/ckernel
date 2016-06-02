@@ -16,6 +16,7 @@ namespace cService.Test
         private const string Cs4 = "server=118.69.196.250;database=Futa3rdTracking;uid=futa3rdtracking;pwd=OYsLdL10vRNP21mrtu6B;";
         private const string Cs5 = "server=112.213.84.183;database=FutaTaxi;uid=futadev;pwd=CNLuwcRhLT;";
         private const string Cs6 = "server=118.69.196.250;database=TicketOnline;uid=ticket;pwd=qweqw@#$@#sSDFSD(*(*_!#!@ds;";
+        private const string Cs7 = "server=118.69.196.250;database=FutaBooking;uid=ftbooking;pwd=OSaWGPfkdOyK9COBm4Wd;";
 
         [TestMethod]
         public void TestGetMethod()
@@ -232,27 +233,48 @@ namespace cService.Test
 
                 var obj = new GCRequest()
                 {
-                    _a = "pGettbl_Ticket_FavouriteLocation_View",
+                    _a = "fGettbl_Ticket",
                     _c = new Dictionary<string, object>
                     {
-                        {"CustId", 1}
+                        {"Status", 1}
                     },
-                    _f = "SrcLat,SrcLng,DestLat,DestLng,NumTicket",
-                    _od = new Dictionary<string, string>()
-                    {
-                        {"NumTicket", "DESC" }
-                    },
-                    _os = 0,
-                    _lm = 10
+                    _f = "SrcLat,SrcLng,DestLat,DestLng"
                 };
                 var robj = s.P(obj);
-                count = robj.TotalRecordCount;
+                count = robj.Result;
             }
             catch (Exception)
             {
 
             }
-            Assert.AreEqual(4, count);
+            Assert.AreEqual(1, count);
+        }
+
+        [TestMethod]
+        public void TestGetMethod9()
+        {
+            var count = false;
+            try
+            {
+                var s = new S(Cs7);
+
+                var obj = new GCRequest()
+                {
+                    _a = "fGettbl_Route_Online_View",
+                    _c = new Dictionary<string, object>
+                    {
+                        {"Status", 1}
+                    },
+                    _f = "Id,Name"
+                };
+                var robj = s.P(obj);
+                count = robj.Records.Count > 0;
+            }
+            catch (Exception)
+            {
+
+            }
+            Assert.AreEqual(true, count);
         }
 
         [TestMethod]

@@ -618,7 +618,7 @@ namespace CTool.Builder.Db
                     return "int";
 
                 case "bigint":
-                    return "int";
+                    return "long";
 
                 case "double":
                     return "double";
