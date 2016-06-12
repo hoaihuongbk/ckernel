@@ -8,6 +8,7 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using CTool.Builder.Db;
 using System.IO;
+using CTool.Builder.Javascript;
 
 namespace CTool
 {
@@ -395,6 +396,43 @@ namespace CTool
                 var selectTbl = _getSelectTable();
 
                 k.BuildDBCRUD(selectTbl);
+
+                Response.Redirect(HttpContext.Current.Request.RawUrl);
+            }
+            catch (Exception ex)
+            {
+                Message.Text = ex.Message;
+                Message.Style.Add("color", "red");
+            }
+        }
+
+        protected void btnBuildJsModel_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                var info = _getDBConnectionString();
+                var k = new ModelBuilder(info);
+
+                var selectTbl = _getSelectTable();
+                var selectV = _getSelectView();
+
+                k.BuildJsDictionary(selectTbl, selectV);
+
+                //Zip
+                if (HttpContext.Current.Session["conStr"] != null)
+                {
+                    var zipFileName = "JsDict" + GetMd5Sum(HttpContext.Current.Session["conStr"].ToString());
+                    var zipFilePath = k.ZipJsDict(zipFileName);
+                    if (!String.IsNullOrEmpty(zipFilePath))
+                    {
+                        Response.ContentType = "application/zip";
+                        Response.AppendHeader("Content-Disposition", string.Format("attachment; filename={0}.zip;", zipFileName));
+                        Response.WriteFile(zipFilePath);
+                        Response.Flush();
+                        File.Delete(zipFilePath);
+                        Response.End();
+                    }
+                }
 
                 Response.Redirect(HttpContext.Current.Request.RawUrl);
             }

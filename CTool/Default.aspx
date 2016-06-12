@@ -76,6 +76,7 @@
                     <asp:Button ID="btnBuildDBModel" runat="server" CssClass="btn btn-success" Text="Build DB Model" OnClick="btnBuildDBModel_Click" />
                     <asp:Button ID="btnDropViewExtendProperty" runat="server" CssClass="btn btn-danger" Text="Drop Ckernel Extend Properties" OnClick="btnDropViewExtendProperty_Click" />
                     <asp:Button ID="btnBuildCRUD" runat="server" CssClass="btn btn-warning" Text="Build CRUD Store Procedure" OnClick="btnBuildCRUD_Click" />
+                     <asp:Button ID="btnBuildJsModel" runat="server" CssClass="btn btn-success" Text="Build Js Model" OnClick="btnBuildJsModel_Click" />
                     <%--<asp:Button ID="btnDropBuiltInView" runat="server" CssClass="btn btn-danger" Text="Drop Build-In View" OnClick="btnDropBuiltInView_Click" />--%>
                 </div>
             </div>
