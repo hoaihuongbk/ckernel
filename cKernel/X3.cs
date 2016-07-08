@@ -32,10 +32,12 @@ namespace cKernel
         private int _pIdx;     //Current pushed condition index
         private string _f;     //Query fields  
 
-        private readonly string[][][] _c = new string[10][][];
-        private readonly string[][][] _d = new string[10][][];
+        //private readonly string[][][] _c = new string[10][][];
+        //private readonly string[][][] _d = new string[10][][];
+        private readonly string[][][] _c = new string[100][][];
+        private readonly string[][][] _d = new string[100][][];
 
-        private readonly string[][] _od = new string[15][];
+        private readonly string[][] _od = new string[100][];
 
         //SQL Statement
         private readonly List<SqlCommand> _sql = new List<SqlCommand>();
@@ -847,7 +849,7 @@ namespace cKernel
                         item.Connection = con;
                         item.Transaction = transaction;
                         var result = item.ExecuteScalar();
-                        _r._d.Add(new[] {result});
+                        _r._d.Add(new [] { result });
                     }
                     // Attempt to commit the transaction.
                     transaction.Commit();

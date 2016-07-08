@@ -31,10 +31,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="cModel, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\futa-website\trunk\PT.Agent\PT.Agent\Libs\cModel.dll</HintPath>
-    </Reference>
     <Reference Include="Report">
       <HintPath>..\cLibs\Report.dll</HintPath>
     </Reference>
@@ -52,6 +48,12 @@
     <None Include="XR.cs.bak" />
     <Compile Include="_E.cs" />
     <Compile Include="_GB.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\cModel\cModel.csproj">
+      <Project>{b0bd0c33-206a-4788-9e25-62c73594a947}</Project>
+      <Name>cModel</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
