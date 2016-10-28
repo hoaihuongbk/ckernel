@@ -51,7 +51,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\cModel\cModel.csproj">
-      <Project>{b0bd0c33-206a-4788-9e25-62c73594a947}</Project>
+      <Project>{B0BD0C33-206A-4788-9E25-62C73594A947}</Project>
       <Name>cModel</Name>
     </ProjectReference>
   </ItemGroup>

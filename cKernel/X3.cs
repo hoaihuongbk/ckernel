@@ -538,6 +538,13 @@ namespace cKernel
                     case SqlDbType.Bit:
                         v = t1[2].Equals("1") || t1[2].Equals("True");
                         break;
+                    case SqlDbType.Date:
+                    case SqlDbType.DateTime:
+                        if (string.IsNullOrEmpty(t1[2]))
+                        {
+                            v = DBNull.Value;
+                        }
+                        break;
                     default:
                         break;
                 }
@@ -620,6 +627,13 @@ namespace cKernel
                         case SqlDbType.Bit:
                             v = t1[2].Equals("1") || t1[2].Equals("True");
                             break;
+                        case SqlDbType.Date:
+                        case SqlDbType.DateTime:
+                            if (string.IsNullOrEmpty(t1[2]))
+                            {
+                                v = DBNull.Value;
+                            }
+                            break;
                         default:
                             break;
                     }
@@ -689,18 +703,33 @@ namespace cKernel
         #region Store procedure statement
         public void SP(string sp, string[][][] c)
         {
-            var fcond = c.FirstOrDefault(i => i != null);
-            if (fcond != null)
+            //var fcond = c.FirstOrDefault(i => i != null);
+            //if (fcond != null)
+            //{
+            //    var cmd = new SqlCommand() {
+            //        CommandType = CommandType.StoredProcedure
+            //    };
+            //    List<SqlParameter> pc = LWSP(fcond, fcond.Length);
+            //    cmd.CommandText = sp;
+            //    cmd.Parameters.AddRange(pc.ToArray());
+            //    _sql.Add(cmd);
+            //}
+
+            foreach(var item in c)
             {
-                var cmd = new SqlCommand() {
-                    CommandType = CommandType.StoredProcedure
-                };
-                List<SqlParameter> pc = LWSP(fcond, fcond.Length);
-                cmd.CommandText = sp;
-                cmd.Parameters.AddRange(pc.ToArray());
-                _sql.Add(cmd);
+                if(item != null)
+                {
+                    var cmd = new SqlCommand()
+                    {
+                        CommandType = CommandType.StoredProcedure
+                    };
+                    List<SqlParameter> pc = LWSP(item, item.Length);
+                    cmd.CommandText = sp;
+                    cmd.Parameters.AddRange(pc.ToArray());
+                    _sql.Add(cmd);
+                }
             }
-            
+
         }
         public List<SqlParameter> LWSP(string[][] f, int l)
         {
@@ -809,18 +838,37 @@ namespace cKernel
 
                 try
                 {
-                    var statement = sql.FirstOrDefault();
-                    if (statement != null)
+                    //var statement = sql.FirstOrDefault();
+                    //if (statement != null)
+                    //{
+                    //    var result = new DataTable();
+                    //    statement.Connection = con;
+                    //    statement.Transaction = transaction;
+                    //    var adap = new SqlDataAdapter(statement);
+                    //    adap.Fill(result);
+                    //    var list = new List<object[]>();
+                    //    for (var m = 0; m < result.Rows.Count; m++) list.Add(result.Rows[m].ItemArray);
+                    //    _r._d = list; _r._t = result.Rows.Count;
+                    //}
+                    //// Attempt to commit the transaction.
+                    //transaction.Commit();
+                    _r._d = new List<object[]>();
+                    _r._t = 0;
+                    foreach(var item in sql)
                     {
-                        var result = new DataTable();
-                        statement.Connection = con;
-                        statement.Transaction = transaction;
-                        var adap = new SqlDataAdapter(statement);
-                        adap.Fill(result);
-                        var list = new List<object[]>();
-                        for (var m = 0; m < result.Rows.Count; m++) list.Add(result.Rows[m].ItemArray);
-                        _r._d = list; _r._t = result.Rows.Count;
+                        if(item != null)
+                        {
+                            var result = new DataTable();
+                            item.Connection = con;
+                            item.Transaction = transaction;
+                            var adap = new SqlDataAdapter(item);
+                            adap.Fill(result);
+                            var list = new List<object[]>();
+                            for (var m = 0; m < result.Rows.Count; m++) list.Add(result.Rows[m].ItemArray);
+                            _r._d = _r._d.Concat(list).ToList(); _r._t += result.Rows.Count;
+                        }
                     }
+
                     // Attempt to commit the transaction.
                     transaction.Commit();
                 }
