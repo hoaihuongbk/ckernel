@@ -1,0 +1,208 @@
+﻿<#@ template language="C#" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ parameter type="string" name="NameSpace"#>
+<#@ parameter type="string" name="ClassName"#>
+<#@ parameter type="IList<string>" name="ListModels"#>
+using ServiceStack;
+using ServiceStack.Auth;
+using ServiceStack.Data;
+using ServiceStack.OrmLite;
+using System;
+using System.Data;
+using System.Linq;
+using <#= NameSpace #>.Dto;
+using System.Collections.Generic;
+using PT.Common.Constant;
+using PT.Common.Repository;
+
+namespace <#= NameSpace #>.Repository.OrmLite
+{
+	public class OrmLite<#= ClassName #>Repository : OrmLite<#= ClassName #>Repository<<# for (var i = 0; i < ListModels.Count; i++) { #><#= ListModels[i] #><# if( i < ListModels.Count - 1) {#>,<# } #><# } #>>
+    {
+        public OrmLite<#= ClassName #>Repository(IDbConnectionFactory dbFactory) : base(dbFactory) { }
+        public OrmLite<#= ClassName #>Repository(IDbConnectionFactory dbFactory, string namedConnnection = null)
+            : base(dbFactory, namedConnnection) { }
+    }
+
+	public class OrmLite<#= ClassName #>Repository<<# for (var i = 0; i < ListModels.Count; i++) { #>T<#= ListModels[i] #><# if( i < ListModels.Count - 1) {#>,<# } #> <# } #>> : OrmLiteBaseRepository, I<#= ClassName #>Repository, IRequiresSchema, IClearable
+       <# foreach (var item in ListModels) { #> 
+		 where T<#= item #> : class, I<#= item #>   		
+		<# } #>
+    {
+		public OrmLite<#= ClassName #>Repository(IDbConnectionFactory dbFactory, string namedConnnection = null): base(dbFactory, namedConnnection) { }
+
+		#region Initialization
+		public virtual void InitSchema()
+        {
+            Exec(db =>
+            {
+				<# 
+					for (var i = 0; i < ListModels.Count; i++) 
+					{ 
+				#>
+					 db.CreateTableIfNotExists<T<#= ListModels[i] #>>();
+				<# 
+					} 
+				#>
+            });
+        }
+
+		public virtual void DropAndReCreateTables()
+        {
+            Exec(db =>
+            {
+				<# 
+					for (var i = 0; i < ListModels.Count; i++) 
+					{ 
+				#>
+					 db.DropAndCreateTable<T<#= ListModels[i] #>>();
+				<# 
+					} 
+				#>
+            });
+        }
+
+		
+
+        public void Clear()
+        {
+            Exec(db =>
+            {
+				<# 
+					for (var i = 0; i < ListModels.Count; i++) 
+					{ 
+				#>
+					 db.DeleteAll<T<#= ListModels[i] #>>();
+				<# 
+					} 
+				#>
+            });
+        }
+
+		#endregion
+
+		public virtual I<#= ClassName #> Create<#= ClassName #>(I<#= ClassName #> new<#= ClassName #>)
+        {
+            return Exec(db =>
+            {
+                AssertNoExisting<#= ClassName #>(db, new<#= ClassName #>);
+
+				new<#= ClassName #>.Status = (int)DataStatus.Enabled;
+                new<#= ClassName #>.IsPrgCreatedDate = DateTime.Now;
+                new<#= ClassName #>.IsPrgUpdatedDate = new<#= ClassName #>.IsPrgCreatedDate;
+
+                db.Save((T<#= ClassName #>)new<#= ClassName #>);
+
+                new<#= ClassName #> = db.SingleById<T<#= ClassName #>>(new<#= ClassName #>.Id);
+                return new<#= ClassName #>;
+            });
+        }
+
+		protected void AssertNoExisting<#= ClassName #>(IDbConnection db, I<#= ClassName #> new<#= ClassName #>, I<#= ClassName #> exceptForExisting<#= ClassName #> = null)
+        {
+            var existing<#= ClassName #> = Get<#= ClassName #>(new<#= ClassName #>.Id);
+            if (existing<#= ClassName #> != null
+                && (exceptForExisting<#= ClassName #> == null || existing<#= ClassName #>.Id != exceptForExisting<#= ClassName #>.Id))
+                throw new ArgumentException("<#= ClassName #> is already exists");
+        }
+
+		public virtual I<#= ClassName #> Update<#= ClassName #>(I<#= ClassName #> existing<#= ClassName #>, I<#= ClassName #> new<#= ClassName #>)
+        {
+            return Exec(db =>
+            {
+                AssertNoExisting<#= ClassName #>(db, new<#= ClassName #>, existing<#= ClassName #>);
+
+                using (var trans = db.OpenTransaction())
+                {
+					<# 
+						if (ListModels.Contains(string.Format("{0}Log", ClassName))) 
+						{ 
+					#>
+                    var log = Activator.CreateInstance<T<#= ClassName #>Log>();
+                    log.<#= ClassName #>Id = existing<#= ClassName #>.Id;
+                    log.Note = existing<#= ClassName #>.CreateLog();
+                    log.IsPrgCreatedDate = DateTime.Now;
+                    log.IsPrgUpdatedDate = log.IsPrgCreatedDate;
+
+                    db.Insert(log);
+					<# 
+						} 
+					#>
+
+                    new<#= ClassName #>.Id = existing<#= ClassName #>.Id;
+                    new<#= ClassName #>.IsPrgCreatedDate = existing<#= ClassName #>.IsPrgCreatedDate;
+                    new<#= ClassName #>.IsPrgUpdatedDate = DateTime.Now;
+
+                    db.Save((T<#= ClassName #>)new<#= ClassName #>);
+
+                    trans.Commit();
+                }
+
+
+
+                return new<#= ClassName #>;
+            });
+        }
+
+		public virtual void Delete<#= ClassName #>(int id)
+        {
+            Exec(db =>
+            {
+                using (var trans = db.OpenTransaction())
+                {
+					var item = Get<#= ClassName #>(id);
+					<# 
+						if (ListModels.Contains(string.Format("{0}Log", ClassName))) 
+						{ 
+					#>
+                    var log = Activator.CreateInstance<T<#= ClassName #>Log>();
+                    log.<#= ClassName #>Id = item.Id;
+                    log.Note = item.CreateLog();
+                    log.IsPrgCreatedDate = DateTime.Now;
+                    log.IsPrgUpdatedDate = log.IsPrgCreatedDate;
+
+                    db.Insert(log);
+					<# 
+						} 
+					#>
+
+                    item.Status = (int)DataStatus.Disabled;
+                    item.IsPrgUpdatedDate = DateTime.Now;
+                    db.Save((T<#= ClassName #>)item);
+
+                    trans.Commit();
+                }
+            });
+        }
+
+		public virtual I<#= ClassName #> Get<#= ClassName #>(int id)
+        {
+            return Exec(db =>
+            {
+                return db.Select<T<#= ClassName #>>(c => c.Id == id).FirstOrDefault();
+            });
+        }
+
+		public virtual IEnumerable<I<#= ClassName #>> GetList<#= ClassName #>(int numRowPerPage = 10, int page = 1)
+        {
+            return Exec(db =>
+            {
+                return db.Select<T<#= ClassName #>>(c => c.Status == (int)DataStatus.Enabled)
+					.OrderByDescending(c => c.IsPrgUpdatedDate)
+					.Skip((page - 1) * numRowPerPage)
+					.Take(numRowPerPage)
+					.ToList();
+            });
+        }
+
+		public virtual long Count<#= ClassName #>()
+		{
+			return Exec(db =>
+            {
+				return db.Count<T<#= ClassName #>>(c => c.Status == (int)DataStatus.Enabled);
+			});
+		}
+
+    }
+}

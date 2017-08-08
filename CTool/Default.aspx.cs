@@ -442,5 +442,65 @@ namespace CTool
                 Message.Style.Add("color", "red");
             }
         }
+
+        protected void btnBuildRepo_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                DbBuilder dbBuilder = new DbBuilder(this._getDBConnectionString(), this._getNamespace());
+                var selectTbl = _getSelectTable();
+
+                dbBuilder.BuildDBRepo(selectTbl);
+                if (HttpContext.Current.Session["conStr"] != null)
+                {
+                    string str = string.Concat("DBRepo", this.GetMd5Sum(HttpContext.Current.Session["conStr"].ToString()));
+                    string str1 = dbBuilder.ZipDBModel(str);
+                    if (!string.IsNullOrEmpty(str1))
+                    {
+                        base.Response.ContentType = "application/zip";
+                        base.Response.AppendHeader("Content-Disposition", string.Format("attachment; filename={0}.zip;", str));
+                        base.Response.WriteFile(str1);
+                        base.Response.Flush();
+                        File.Delete(str1);
+                        base.Response.End();
+                    }
+                }
+                base.Response.Redirect(HttpContext.Current.Request.RawUrl);
+            }
+            catch (Exception exception)
+            {
+                this.Message.Text = exception.Message;
+                this.Message.Style.Add("color", "red");
+            }
+        }
+
+        //protected void btnBuildRepoService_Click(object sender, EventArgs e)
+        //{
+        //    try
+        //    {
+        //        ServiceBuilder serviceBuilder = new ServiceBuilder(this._getDBConnectionString(), this._getNamespace());
+        //        serviceBuilder.BuildRepoService();
+        //        if (HttpContext.Current.Session["conStr"] != null)
+        //        {
+        //            string str = string.Concat("RepoService", this.GetMd5Sum(HttpContext.Current.Session["conStr"].ToString()));
+        //            string str1 = serviceBuilder.ZipRepoService(str);
+        //            if (!string.IsNullOrEmpty(str1))
+        //            {
+        //                base.Response.ContentType = "application/zip";
+        //                base.Response.AppendHeader("Content-Disposition", string.Format("attachment; filename={0}.zip;", str));
+        //                base.Response.WriteFile(str1);
+        //                base.Response.Flush();
+        //                File.Delete(str1);
+        //                base.Response.End();
+        //            }
+        //        }
+        //        base.Response.Redirect(HttpContext.Current.Request.RawUrl);
+        //    }
+        //    catch (Exception exception)
+        //    {
+        //        this.Message3.Text = exception.Message;
+        //        this.Message3.Style.Add("color", "red");
+        //    }
+        //}
     }
 }

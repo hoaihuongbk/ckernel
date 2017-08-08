@@ -36,10 +36,24 @@ namespace CTool.Builder.Db
         private readonly string _lbdir = HttpContext.Current.Server.MapPath("~/ObjectBuilder/");
         private readonly string _modelDir = HttpContext.Current.Server.MapPath("~/ObjectBuilder/Models/");
 
+        private readonly string _repoDir = HttpContext.Current.Server.MapPath("~/ObjectBuilder/Repos/");
+
+        private readonly string _irepoDir = HttpContext.Current.Server.MapPath("~/ObjectBuilder/Repos/Interfaces/");
+
+        private readonly string _oirepoDir = HttpContext.Current.Server.MapPath("~/ObjectBuilder/Repos/OrmLite/");
+
+        private readonly string _prepoDir = HttpContext.Current.Server.MapPath("~/ObjectBuilder/Repos/Plugins/");
+
+        private readonly string _erepoDir = HttpContext.Current.Server.MapPath("~/ObjectBuilder/Repos/Extensions/");
+
+        private readonly string _dtoDir = HttpContext.Current.Server.MapPath("~/ObjectBuilder/Repos/Dto/");
+
+        private readonly string _clDir = HttpContext.Current.Server.MapPath("~/ObjectBuilder/Repos/Cl/");
+
         public DbBuilder(string connStr, string ns = "")
         {
             _conStr = connStr;
-            _ns = !String.IsNullOrEmpty(ns) ? ns.Substring(0,8).ToUpper() : String.Format("{0:X8}", connStr.GetHashCode()).ToUpper();
+            _ns = !String.IsNullOrEmpty(ns) ? ns.PadLeft(8,'0').Substring(0,8).ToUpper() : String.Format("{0:X8}", connStr.GetHashCode()).ToUpper();
         }
 
         /// <summary>
@@ -67,7 +81,7 @@ namespace CTool.Builder.Db
                 const string pScope =
                     "using cModel;\r\nusing cKernel;\r\n namespace _{1}.Extend\r\n{{\r\n    public class P\r\n    {{\r\n        private static string _cs; private static bool _isDebug = false; private static int _loggedUserId; \r\n\t\tpublic P(string cs, bool isDebug, int uid) {{ _cs = cs; _isDebug = isDebug; _loggedUserId = uid; }}\r\n{0}\r\n    }}\r\n}}";
                 const string pFormat =
-                    "\t\t//for {0}\r\n\t\tpublic static void {0}(GCRequest obj, out GCResponse oo)\r\n\t\t{{\r\n\t\t    var x = new X3(_cs, _isDebug, _loggedUserId ); x.SDA(D._a, DE._a); x.SDFD(D._fd, DE._fd); x.Init(obj);\r\n\t\t    var r = x.R().A(){1}._CC()._CF()._CO()._CLO().L().S().EX().G();\r\n\t\t    oo = new GCResponse {{ Result = r._e ? 0 : 1, Records = r._d, TotalRecordCount = r._t, Message = r._m }};\r\n\t\t}}\r\n";
+                    "\t\t//for {0}\r\n\t\tpublic static void {0}(GCRequest obj, out GCResponse oo)\r\n\t\t{{\r\n\t\t    var x = new X4(_cs, _isDebug, _loggedUserId ); x.SDA(D._a, DE._a); x.SDFD(D._fd, DE._fd); x.Init(obj);\r\n\t\t    var r = x.R().A(){1}._CC()._CF()._CO()._CLO().L().S().EX().G();\r\n\t\t    oo = new GCResponse {{ Result = r._e ? 0 : 1, Records = r._d, TotalRecordCount = r._t, Message = r._m }};\r\n\t\t}}\r\n";
                 const string pCFormat = ".Pc(\"{0}\")";
 
                 const string deScope =
@@ -653,6 +667,92 @@ namespace CTool.Builder.Db
             return "string";
         }
 
+        private string _sqlToRepoType(string type)
+        {
+            if (type == "char")
+            {
+                return "string";
+            }
+            if (type == "nchar")
+            {
+                return "string";
+            }
+            if (type == "varchar")
+            {
+                return "string";
+            }
+            if (type == "nvarchar")
+            {
+                return "string";
+            }
+            if (type == "text")
+            {
+                return "string";
+            }
+            if (type == "ntext")
+            {
+                return "string";
+            }
+            if (type == "int")
+            {
+                return "int";
+            }
+            if (type == "bigint")
+            {
+                return "int";
+            }
+            if (type == "double")
+            {
+                return "double";
+            }
+            if (type == "float")
+            {
+                return "float";
+            }
+            if (type == "real")
+            {
+                return "float";
+            }
+            if (type == "numeric")
+            {
+                return "int";
+            }
+            if (type == "datetime")
+            {
+                return "DateTime";
+            }
+            if (type == "bit")
+            {
+                return "bool";
+            }
+            if (type == "image")
+            {
+                return "string";
+            }
+            if (type == "tinyint")
+            {
+                return "int";
+            }
+            if (type == "byte")
+            {
+                return "byte";
+            }
+            if (type != "smallint")
+            {
+                return "string";
+            }
+            return "int";
+        }
+
+        private int _sqlGetMaxLength(string type, int maxLen)
+        {
+            if (type == "nchar" || type == "nvarchar" || type == "ntext")
+            {
+                maxLen = Convert.ToInt32(Math.Ceiling((double)maxLen / 2));
+            }
+            return maxLen;
+        }
+
         //public void BuildDBService()
         //{
         //    //Copy kernel lib to object builder
@@ -1002,5 +1102,181 @@ namespace CTool.Builder.Db
             return String.Empty;
         }
 
+        public void BuildDBRepo(List<ListItem> slTbl = null)
+        {
+            try
+            {
+                string str = HttpContext.Current.Server.MapPath("~/Templates/CSharp/RepoInterface.t4");
+                string str1 = HttpContext.Current.Server.MapPath("~/Templates/CSharp/RepoClass.t4");
+                string str2 = HttpContext.Current.Server.MapPath("~/Templates/CSharp/Repository.t4");
+                string str3 = HttpContext.Current.Server.MapPath("~/Templates/CSharp/RepositoryOrmLite.t4");
+                string str4 = HttpContext.Current.Server.MapPath("~/Templates/CSharp/RepositoryExtensions.t4");
+                string str5 = HttpContext.Current.Server.MapPath("~/Templates/CSharp/RepositoryPlugin.t4");
+                if (!Directory.Exists(this._dtoDir))
+                {
+                    Directory.CreateDirectory(this._dtoDir);
+                }
+                Array.ForEach<string>(Directory.GetFiles(this._dtoDir), new Action<string>(System.IO.File.Delete));
+                if (!Directory.Exists(this._clDir))
+                {
+                    Directory.CreateDirectory(this._clDir);
+                }
+                Array.ForEach<string>(Directory.GetFiles(this._clDir), new Action<string>(System.IO.File.Delete));
+                if (!Directory.Exists(this._prepoDir))
+                {
+                    Directory.CreateDirectory(this._prepoDir);
+                }
+                Array.ForEach<string>(Directory.GetFiles(this._prepoDir), new Action<string>(System.IO.File.Delete));
+                if (!Directory.Exists(this._erepoDir))
+                {
+                    Directory.CreateDirectory(this._erepoDir);
+                }
+                Array.ForEach<string>(Directory.GetFiles(this._erepoDir), new Action<string>(System.IO.File.Delete));
+                if (!Directory.Exists(this._repoDir))
+                {
+                    Directory.CreateDirectory(this._repoDir);
+                }
+                Array.ForEach<string>(Directory.GetFiles(this._repoDir), new Action<string>(System.IO.File.Delete));
+                Connection connection = new Connection(this._conStr);
+                string str6 = this._ns;
+                Dictionary<string, List<string>> strs = new Dictionary<string, List<string>>();
+                IGenerator generator = new Generator();
+                if (slTbl == null || !slTbl.Any<ListItem>())
+                {
+                    DataTable allTables = connection.GetAllTables();
+                    for (int i = 0; i < allTables.Rows.Count; i++)
+                    {
+                        int num = Convert.ToInt32(allTables.Rows[i]["object_id"]);
+                        string str7 = Convert.ToString(allTables.Rows[i]["name"]);
+                        if (!(str7 == "UserAuth") && !(str7 == "UserAuthDetails") && !(str7 == "UserAuthRole") && !(str7 == "ApiKey"))
+                        {
+                            string str8 = str7.Replace("tbl_", "").Replace("_", "").Trim();
+                            string str9 = str8;
+                            string str10 = str9;
+                            if (str10.Substring(str10.Length - 3) == "Log")
+                            {
+                                str9 = str9.Substring(0, str9.Length - 3);
+                            }
+                            if (!strs.ContainsKey(str9))
+                            {
+                                strs.Add(str9, new List<string>()
+                                {
+                                    str8
+                                });
+                            }
+                            else
+                            {
+                                strs[str9].Add(str8);
+                            }
+                            DataTable objectMetaData = connection.GetObjectMetaData(num);
+                            if (objectMetaData.Rows.Count > 0)
+                            {
+                                List<object[]> objArrays = new List<object[]>();
+                                for (int j = 0; j < objectMetaData.Rows.Count; j++)
+                                {
+                                    objArrays.Add(new object[] { this._sqlToRepoType(Convert.ToString(objectMetaData.Rows[j]["type_name"])), objectMetaData.Rows[j]["name"], this._sqlGetMaxLength(Convert.ToString(objectMetaData.Rows[j]["type_name"]), Convert.ToInt32(objectMetaData.Rows[j]["max_length"])) });
+                                }
+                                string str11 = string.Format("{0}\\I{1}.cs", this._dtoDir, str8);
+                                string str12 = string.Format("{0}\\{1}.cs", this._dtoDir, str8);
+                                generator.GenerateToFile(str, str11, new object[] { str6, str8, objArrays });
+                                generator.GenerateToFile(str1, str12, new object[] { str6, str7, str8, objArrays });
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    for (int k = 0; k < slTbl.Count; k++)
+                    {
+                        string str13 = Convert.ToString(slTbl[k].Text);
+                        string str14 = str13.Replace("tbl_", "").Replace("_", "").Trim();
+                        string str15 = str14;
+                        string str16 = str15;
+                        if (str16.Substring(str16.Length - 3) == "Log")
+                        {
+                            str15 = str15.Substring(0, str15.Length - 3);
+                        }
+                        if (!strs.ContainsKey(str15))
+                        {
+                            strs.Add(str15, new List<string>()
+                            {
+                                str14
+                            });
+                        }
+                        else
+                        {
+                            strs[str15].Add(str14);
+                        }
+                        DataTable dataTable = connection.GetObjectMetaData(Convert.ToInt32(slTbl[k].Value));
+                        if (dataTable.Rows.Count > 0)
+                        {
+                            List<object[]> objArrays1 = new List<object[]>();
+                            for (int l = 0; l < dataTable.Rows.Count; l++)
+                            {
+                                objArrays1.Add(new object[] { this._sqlToRepoType(Convert.ToString(dataTable.Rows[l]["type_name"])), dataTable.Rows[l]["name"], this._sqlGetMaxLength(Convert.ToString(dataTable.Rows[l]["type_name"]), Convert.ToInt32(dataTable.Rows[l]["max_length"])) });
+                            }
+                            string str17 = string.Format("{0}\\I{1}.cs", this._dtoDir, str14);
+                            string str18 = string.Format("{0}\\{1}.cs", this._dtoDir, str14);
+                            generator.GenerateToFile(str, str17, new object[] { str6, str14, objArrays1 });
+                            generator.GenerateToFile(str1, str18, new object[] { str6, str13, str14, objArrays1 });
+                        }
+                    }
+                }
+                if (strs.Any<KeyValuePair<string, List<string>>>())
+                {
+                    foreach (KeyValuePair<string, List<string>> keyValuePair in strs)
+                    {
+                        string key = keyValuePair.Key;
+                        string str19 = string.Format("{0}\\I{1}Repository.cs", this._clDir, key);
+                        string str20 = string.Format("{0}\\OrmLite{1}Repository.cs", this._clDir, key);
+                        string str21 = string.Format("{0}\\{1}RepositoryExtensions.cs", this._erepoDir, key);
+                        string str22 = string.Format("{0}\\{1}Feature.cs", this._prepoDir, key);
+                        generator.GenerateToFile(str2, str19, new object[] { str6, key });
+                        IGenerator generator1 = generator;
+                        string str23 = str3;
+                        string str24 = str20;
+                        object[] list = new object[] { str6, key, null };
+                        list[2] = (
+                            from c in keyValuePair.Value
+                            orderby c
+                            select c).ToList<string>();
+                        generator1.GenerateToFile(str23, str24, list);
+                        generator.GenerateToFile(str4, str21, new object[] { str6, key });
+                        IGenerator generator2 = generator;
+                        string str25 = str5;
+                        string str26 = str22;
+                        object[] objArray = new object[] { str6, key, null };
+                        objArray[2] = (
+                            from c in keyValuePair.Value
+                            orderby c
+                            select c).ToList<string>();
+                        generator2.GenerateToFile(str25, str26, objArray);
+                    }
+                }
+            }
+            catch (Exception exception)
+            {
+            }
+        }
+
+        public string ZipDBRepo(string zipFileName)
+        {
+            string str;
+            try
+            {
+                string str1 = HttpContext.Current.Server.MapPath(string.Format("~/ObjectBuilder/{0}.zip", zipFileName));
+                if (System.IO.File.Exists(str1))
+                {
+                    System.IO.File.Delete(str1);
+                }
+                ZipFile.CreateFromDirectory(this._modelDir, str1);
+                str = str1;
+            }
+            catch (Exception exception)
+            {
+                return string.Empty;
+            }
+            return str;
+        }
     }
 }

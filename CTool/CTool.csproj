@@ -139,6 +139,12 @@
     <Content Include="ctool.snk" />
     <None Include="Properties\PublishProfiles\gcorebuilder.pubxml" />
     <None Include="Properties\PublishProfiles\ToolServer.pubxml" />
+    <Content Include="Templates\CSharp\RepoClass.t4" />
+    <Content Include="Templates\CSharp\RepoInterface.t4" />
+    <Content Include="Templates\CSharp\Repository.t4" />
+    <Content Include="Templates\CSharp\RepositoryExtensions.t4" />
+    <Content Include="Templates\CSharp\RepositoryOrmLite.t4" />
+    <Content Include="Templates\CSharp\RepositoryPlugin.t4" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

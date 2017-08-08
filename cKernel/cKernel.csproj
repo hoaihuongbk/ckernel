@@ -43,6 +43,7 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <None Include="X.cs.bak" />
+    <Compile Include="X4.cs" />
     <Compile Include="X3.cs" />
     <None Include="X2.cs.bak" />
     <None Include="XR.cs.bak" />

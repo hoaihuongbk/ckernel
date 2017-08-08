@@ -1,0 +1,16 @@
+﻿<#@ template language="C#" #>
+<#@ import namespace="System" #>
+<#@ parameter type="string" name="NameSpace"#>
+<#@ parameter type="string" name="ClassName"#>
+using ServiceStack.Text;
+using System.Collections.Generic;
+namespace <#= NameSpace #>.Repository.OrmLite
+{
+	public static class <#= ClassName #>RepositoryExtensions
+    {
+        public static string CreateLog(this I<#= ClassName #> record)
+        {
+            return JsonSerializer.SerializeToString(record);
+        }
+    }
+}

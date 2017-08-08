@@ -77,6 +77,7 @@
                     <asp:Button ID="btnDropViewExtendProperty" runat="server" CssClass="btn btn-danger" Text="Drop Ckernel Extend Properties" OnClick="btnDropViewExtendProperty_Click" />
                     <asp:Button ID="btnBuildCRUD" runat="server" CssClass="btn btn-warning" Text="Build CRUD Store Procedure" OnClick="btnBuildCRUD_Click" />
                      <asp:Button ID="btnBuildJsModel" runat="server" CssClass="btn btn-success" Text="Build Js Model" OnClick="btnBuildJsModel_Click" />
+                      <asp:Button ID="btnBuildRepo" runat="server" CssClass="btn btn-success" Text="Build DB Repository" OnClick="btnBuildRepo_Click" />
                     <%--<asp:Button ID="btnDropBuiltInView" runat="server" CssClass="btn btn-danger" Text="Drop Build-In View" OnClick="btnDropBuiltInView_Click" />--%>
                 </div>
             </div>
@@ -86,6 +87,7 @@
             <div class="row-fluid">
                 <asp:Label ID="Message3" runat="server" Text=""></asp:Label><div class="clearfix"></div>
                  <asp:Button ID="btnBuildDBService" runat="server" CssClass="btn btn-danger" Text="Build DB Service" OnClick="btnBuildDBService_Click" />
+                 <%--<asp:Button ID="btnBuildRepoService" runat="server" CssClass="btn btn-primary" Text="Build Repo Service" OnClick="btnBuildRepoService_Click" />--%>
                   <%--<asp:Button ID="btnBuildWebService" runat="server" CssClass="btn btn-default" Text="Build Web Service" OnClick="btnBuildWebService_Click" />--%>
             </div>
             <h4>How to use this service?</h4>

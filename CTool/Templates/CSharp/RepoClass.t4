@@ -1,0 +1,33 @@
+﻿<#@ template language="C#" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ parameter type="string" name="NameSpace"#>
+<#@ parameter type="string" name="TableName"#>
+<#@ parameter type="string" name="ClassName"#>
+<#@ parameter type="IList<object[]>" name="ListFields"#>
+using ServiceStack.DataAnnotations;
+using System;
+namespace <#= NameSpace #>.Dto.OrmLite
+{
+	[Alias("<#= TableName #>")]
+	public class <#= ClassName #> : I<#= ClassName #>
+	{
+<# foreach (var item in ListFields) { #>
+	<# if (item[1].Equals("Id")) { #>
+	[AutoIncrement]
+	<# } #>
+	<# switch(Convert.ToString(item[0])) {
+		case "string":
+	#>
+		[StringLength(<#= item[2] #>)]
+	<#
+			break;
+		default:
+			break;
+	 #>
+
+	<# } #>
+		public <#= item[0] #> <#= item[1] #> { get; set;} 
+<# } #>
+	}
+}

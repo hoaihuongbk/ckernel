@@ -1,0 +1,36 @@
+﻿<#@ template language="C#" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ parameter type="string" name="NameSpace"#>
+<#@ parameter type="string" name="ClassName"#>
+<#@ parameter type="IList<string>" name="ListModels"#>
+using ServiceStack;
+using ServiceStack.Configuration;
+using ServiceStack.OrmLite;
+using <#= NameSpace #>.Repository;
+using <#= NameSpace #>.Repository.OrmLite;
+namespace <#= NameSpace #>.Plugin
+{
+	public class <#= ClassName #>Feature : IPlugin
+    {
+		public void Register(IAppHost appHost)
+        {
+            var container = appHost.GetContainer();
+            var dbFactory = new OrmLiteConnectionFactory(
+          ConfigUtils.GetConnectionString("<#= NameSpace #>"), SqlServerDialect.Provider);
+
+			<# 
+				for (var i = 0; i < ListModels.Count; i++) 
+				{ 
+			#>
+			container.RegisterAutoWiredType(typeof(I<#= ListModels[i] #>), typeof(Repository.OrmLite.<#= ListModels[i] #>));
+			<# 
+				} 
+			#>
+            
+            var repo = new OrmLite<#= ClassName #>Repository(dbFactory);
+            container.Register<I<#= ClassName #>Repository>(c => repo);
+            repo.InitSchema();
+        }
+	}
+}
