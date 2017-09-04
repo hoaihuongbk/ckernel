@@ -81,7 +81,7 @@ namespace CTool.Builder.Db
                 const string pScope =
                     "using cModel;\r\nusing cKernel;\r\n namespace _{1}.Extend\r\n{{\r\n    public class P\r\n    {{\r\n        private static string _cs; private static bool _isDebug = false; private static int _loggedUserId; \r\n\t\tpublic P(string cs, bool isDebug, int uid) {{ _cs = cs; _isDebug = isDebug; _loggedUserId = uid; }}\r\n{0}\r\n    }}\r\n}}";
                 const string pFormat =
-                    "\t\t//for {0}\r\n\t\tpublic static void {0}(GCRequest obj, out GCResponse oo)\r\n\t\t{{\r\n\t\t    var x = new X4(_cs, _isDebug, _loggedUserId ); x.SDA(D._a, DE._a); x.SDFD(D._fd, DE._fd); x.Init(obj);\r\n\t\t    var r = x.R().A(){1}._CC()._CF()._CO()._CLO().L().S().EX().G();\r\n\t\t    oo = new GCResponse {{ Result = r._e ? 0 : 1, Records = r._d, TotalRecordCount = r._t, Message = r._m }};\r\n\t\t}}\r\n";
+                    "\t\t//for {0}\r\n\t\tpublic static void {0}(GCRequest obj, out GCResponse oo)\r\n\t\t{{\r\n\t\t    var x = new X3(_cs, _isDebug, _loggedUserId ); x.SDA(D._a, DE._a); x.SDFD(D._fd, DE._fd); x.Init(obj);\r\n\t\t    var r = x.R().A(){1}._CC()._CF()._CO()._CLO().L().S().EX().G();\r\n\t\t    oo = new GCResponse {{ Result = r._e ? 0 : 1, Records = r._d, TotalRecordCount = r._t, Message = r._m }};\r\n\t\t}}\r\n";
                 const string pCFormat = ".Pc(\"{0}\")";
 
                 const string deScope =

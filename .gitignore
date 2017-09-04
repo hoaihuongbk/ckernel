@@ -26,3 +26,6 @@
 /cDict/bin
 /TestResults
 /.vs
+/cService.Test
+/CTool.NetCore/obj
+/CTool.NetCore/bin
