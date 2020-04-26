@@ -1,6 +1,6 @@
 # cKernel with build tools
 
-Single point for all CRUD api
+Single endpoint for all CRUD api
 
 ## Usage
 
