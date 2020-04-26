@@ -9,19 +9,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "cKernel.Extend", "cKernel.E
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "cDict", "cDict\cDict.csproj", "{FBD0A9AE-A130-40B4-B860-9358B073ACD6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gCoreManager", "gCoreManager\gCoreManager.csproj", "{37C19DC5-C612-4AAC-A322-15A8B3805DF2}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "cService", "cService\cService.csproj", "{DB10B62B-3723-46F1-B7E1-587D48FE96EF}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "cModel", "cModel\cModel.csproj", "{B0BD0C33-206A-4788-9E25-62C73594A947}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "cService.Test", "cService.Test\cService.Test.csproj", "{AB088055-C24B-4C1F-BB30-B6048A321AA4}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CTool", "CTool\CTool.csproj", "{6AB08A9D-8F27-4C1E-9A76-945BE8AD94A1}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CKernel.Tests", "CKernel.Tests\CKernel.Tests.csproj", "{01AE51DE-8D06-452B-9541-6A810EAC96F3}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CTool.NetCore", "CTool.NetCore\CTool.NetCore.csproj", "{173EDB6A-FD7C-4CF2-B269-4421F29CEEAF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
